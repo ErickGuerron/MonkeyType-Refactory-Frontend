@@ -1,7 +1,5 @@
 ---
-import { initAuthForms } from '../../scripts/auth-client';
-
-type Mode = 'login' | 'register' | 'reset';
+type Mode = 'login' | 'register' | 'reset' | 'reset-confirm';
 
 interface LinkItem {
 	href: string;
@@ -30,8 +28,6 @@ const formId = `auth-form-${mode}`;
 
 	{note && <p class="auth-form__note">{note}</p>}
 
-	<div class="status-box" data-auth-status data-tone="info"></div>
-
 	<form class="auth-form__body" data-auth-form data-mode={mode} id={formId} novalidate>
 		{mode === 'register' && (
 			<label class="field">
@@ -40,10 +36,12 @@ const formId = `auth-form-${mode}`;
 			</label>
 		)}
 
-		<label class="field">
-			<span>Email</span>
-			<input autocomplete="email" name="email" placeholder="name@monkeytype.dev" required type="email" />
-		</label>
+		{mode !== 'reset-confirm' && (
+			<label class="field">
+				<span>Email</span>
+				<input autocomplete="email" name="email" placeholder="name@monkeytype.dev" required type="email" />
+			</label>
+		)}
 
 		{mode !== 'reset' && (
 			<label class="field">
@@ -52,7 +50,7 @@ const formId = `auth-form-${mode}`;
 			</label>
 		)}
 
-		{mode === 'register' && (
+		{(mode === 'register' || mode === 'reset-confirm') && (
 			<label class="field">
 				<span>Confirm password</span>
 				<input autocomplete="new-password" name="confirmPassword" placeholder="••••••••" required type="password" />
@@ -71,7 +69,9 @@ const formId = `auth-form-${mode}`;
 	)}
 </article>
 
-<script type="module">
+<script>
+	import { initAuthForms } from '../../scripts/auth-client';
+
 	initAuthForms();
 </script>
 

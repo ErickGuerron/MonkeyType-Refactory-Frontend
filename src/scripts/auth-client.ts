@@ -4,15 +4,42 @@ import {
 	clearSession,
 	getCurrentUser,
 	postAuth,
+	postJson,
 	readSession,
 	saveSession
 } from '../lib/auth-api';
+import type { GenericApiPayload } from '../lib/auth-api';
+import { showErrorAlert, showSuccessAlert, showToast } from '../lib/alerts';
 
-type FormMode = 'login' | 'register' | 'reset';
+type FormMode = 'login' | 'register' | 'reset' | 'reset-confirm';
 
 function redirectToLogin() {
 	const next = `${window.location.pathname}${window.location.search}`;
 	window.location.href = `/login?next=${encodeURIComponent(next)}`;
+}
+
+function redirectToPath(path: string) {
+	window.location.href = path;
+}
+
+function getSafeNextPath() {
+	const next = new URLSearchParams(window.location.search).get('next');
+	return next && next.startsWith('/') ? next : '/home';
+}
+
+function getResetToken() {
+	return new URLSearchParams(window.location.search).get('token')?.trim() || '';
+}
+
+function setSubmittingState(form: HTMLFormElement, isSubmitting: boolean) {
+	const submitButton = form.querySelector<HTMLButtonElement>('button[type="submit"]');
+
+	if (isSubmitting) {
+		submitButton?.setAttribute('disabled', 'true');
+		return;
+	}
+
+	submitButton?.removeAttribute('disabled');
 }
 
 function setStatus(target: HTMLElement | null, message: string, tone: 'error' | 'success' | 'info') {
@@ -36,25 +63,46 @@ function clearStatus(target: HTMLElement | null) {
 }
 
 async function submitAuthForm(form: HTMLFormElement, mode: FormMode) {
-	const status = form.parentElement?.querySelector<HTMLElement>('[data-auth-status]') || null;
-	const submitButton = form.querySelector<HTMLButtonElement>('button[type="submit"]');
 	const formData = new FormData(form);
-
-	clearStatus(status);
-	submitButton?.setAttribute('disabled', 'true');
+	setSubmittingState(form, true);
 
 	try {
 		if (mode === 'reset') {
 			const email = String(formData.get('email') || '').trim();
 			if (!email) {
-				throw new ApiError('Ingresá tu email para dejar preparado el flujo de recuperación.', 400);
+				throw new ApiError('Ingresá tu email para continuar con la recuperación.', 400);
 			}
 
-			setStatus(
-				status,
-				`Todavía no existe un endpoint de reset en el backend. Dejé la UI lista para conectarlo cuando esté disponible. API actual: ${API_BASE_URL}`,
-				'info'
+			await postJson<GenericApiPayload>('/auth/forgot-password', { email });
+			form.reset();
+			await showSuccessAlert(
+				'Revisá tu correo',
+				'Si el email existe en MonkeyType, ya enviamos el enlace de recuperación.'
 			);
+			return;
+		}
+
+		if (mode === 'reset-confirm') {
+			const password = String(formData.get('password') || '');
+			const confirmPassword = String(formData.get('confirmPassword') || '');
+			const token = getResetToken();
+
+			if (!token) {
+				throw new ApiError('Falta el token de recuperación en el enlace.', 400);
+			}
+
+			if (!password) {
+				throw new ApiError('Ingresá tu nueva contraseña.', 400);
+			}
+
+			if (password !== confirmPassword) {
+				throw new ApiError('Las contraseñas no coinciden.', 400);
+			}
+
+			await postJson<GenericApiPayload>('/auth/reset-password', { token, password });
+			form.reset();
+			await showSuccessAlert('Contraseña actualizada', 'Ya podés iniciar sesión con tu nueva contraseña.');
+			redirectToPath('/login');
 			return;
 		}
 
@@ -84,16 +132,20 @@ async function submitAuthForm(form: HTMLFormElement, mode: FormMode) {
 
 		const payload = await postAuth(mode === 'login' ? '/auth/login' : '/auth/register', body);
 		saveSession(payload);
-		setStatus(status, mode === 'login' ? 'Login exitoso. Redirigiendo a /home...' : 'Cuenta creada. Redirigiendo a /home...', 'success');
+		void showToast({
+			title: mode === 'login' ? 'Login exitoso' : 'Cuenta creada',
+			text: mode === 'login' ? 'Redirigiendo a tu dashboard.' : 'Bienvenido a MonkeyType.',
+			icon: 'success',
+			timer: 1400
+		});
 		window.setTimeout(() => {
-			const next = new URLSearchParams(window.location.search).get('next');
-			window.location.href = next && next.startsWith('/') ? next : '/home';
-		}, 450);
+			redirectToPath(getSafeNextPath());
+		}, 900);
 	} catch (error) {
 		const message = error instanceof ApiError ? error.message : 'Ocurrió un error inesperado.';
-		setStatus(status, message, 'error');
+		await showErrorAlert(message);
 	} finally {
-		submitButton?.removeAttribute('disabled');
+		setSubmittingState(form, false);
 	}
 }
 
@@ -107,6 +159,17 @@ export function initAuthForms() {
 
 		form.dataset.bound = 'true';
 		const mode = (form.dataset.mode || 'login') as FormMode;
+
+		if (mode === 'reset-confirm' && !getResetToken()) {
+			const submitButton = form.querySelector<HTMLButtonElement>('button[type="submit"]');
+			submitButton?.setAttribute('disabled', 'true');
+			void showToast({
+				title: 'Enlace incompleto',
+				text: 'Abrí el link completo del email para poder cambiar la contraseña.',
+				icon: 'warning',
+				timer: 3200
+			});
+		}
 
 		form.addEventListener('submit', (event) => {
 			event.preventDefault();

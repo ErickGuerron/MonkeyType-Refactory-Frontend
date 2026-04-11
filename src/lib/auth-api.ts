@@ -18,6 +18,11 @@ export interface SessionPayload extends AuthPayload {
 	storedAt: string;
 }
 
+export interface GenericApiPayload {
+	accepted?: boolean;
+	updated?: boolean;
+}
+
 interface ApiResponse<T> {
 	success: boolean;
 	message: string;
@@ -48,7 +53,7 @@ async function parseResponse<T>(response: Response): Promise<T> {
 	return payload.data;
 }
 
-export async function postAuth(path: string, body: Record<string, string>) {
+export async function postJson<T>(path: string, body: Record<string, unknown>) {
 	const response = await fetch(`${API_BASE_URL}${path}`, {
 		method: 'POST',
 		headers: {
@@ -57,7 +62,12 @@ export async function postAuth(path: string, body: Record<string, string>) {
 		body: JSON.stringify(body)
 	});
 
-	return parseResponse<AuthPayload>(response);
+	return parseResponse<T>(response);
+
+}
+
+export async function postAuth(path: string, body: Record<string, unknown>) {
+	return postJson<AuthPayload>(path, body);
 }
 
 export async function getCurrentUser(token: string, tokenType = 'Bearer') {

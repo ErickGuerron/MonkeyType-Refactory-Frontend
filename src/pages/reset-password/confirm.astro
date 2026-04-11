@@ -1,0 +1,22 @@
+---
+import AuthForm from '../../components/auth/AuthForm.astro';
+import AuthLayout from '../../layouts/AuthLayout.astro';
+---
+
+<AuthLayout
+	title="MonkeyType | Nueva contraseña"
+	description="Definí una nueva contraseña para tu cuenta."
+	activeHref="/reset-password"
+>
+	<AuthForm
+		mode="reset-confirm"
+		title="Elegí una nueva contraseña"
+		description="Usá el enlace que llegó por email para completar el cambio."
+		submitLabel="Guardar nueva contraseña"
+		note="Si el enlace expiró, pedí uno nuevo desde la pantalla de recuperación."
+		links={[
+			{ href: '/reset-password', label: 'Solicitar otro enlace' },
+			{ href: '/login', label: 'Volver a login' }
+		]}
+	/>
+</AuthLayout>

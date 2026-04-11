@@ -1,5 +1,3 @@
----
-import { initAppShell } from '../scripts/auth-client';
 import PrivateLayout from '../layouts/PrivateLayout.astro';
 ---
 
@@ -55,7 +53,9 @@ import PrivateLayout from '../layouts/PrivateLayout.astro';
 	</section>
 </PrivateLayout>
 
-<script type="module">
+<script>
+	import { initAppShell } from '../scripts/auth-client';
+
 	initAppShell();
 </script>
 
