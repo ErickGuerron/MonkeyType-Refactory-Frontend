@@ -10,6 +10,8 @@ interface Props {
 	pageEyebrow?: string;
 	pageTitle: string;
 	pageDescription: string;
+	showPageIntro?: boolean;
+	layoutWidth?: 'default' | 'typing';
 }
 
 const {
@@ -18,7 +20,9 @@ const {
 	activeHref = '/home',
 	pageEyebrow = 'Private area',
 	pageTitle,
-	pageDescription
+	pageDescription,
+	showPageIntro = true,
+	layoutWidth = 'default'
 } = Astro.props;
 ---
 
@@ -26,17 +30,19 @@ const {
 	<div class="page-shell">
 		<AppNavbar mode="private" activeHref={activeHref} />
 
-		<main class="private-layout container">
-			<section class="private-layout__hero terminal-panel">
-				<span class="eyebrow">{pageEyebrow}</span>
-				<h1>{pageTitle}</h1>
-				<p>{pageDescription}</p>
-			</section>
+		<main class:list={['private-layout', layoutWidth === 'typing' ? 'private-layout--typing' : '', layoutWidth === 'typing' ? 'container-wide' : 'container']}>
+			{showPageIntro && (
+				<section class="private-layout__hero terminal-panel">
+					<span class="eyebrow">{pageEyebrow}</span>
+					<h1>{pageTitle}</h1>
+					<p>{pageDescription}</p>
+				</section>
+			)}
 
 			<slot />
 		</main>
 
-		<AppFooter />
+		<AppFooter mode="private" />
 	</div>
 </Layout>
 
@@ -45,11 +51,16 @@ const {
 		display: grid;
 		gap: 1rem;
 		flex: 1;
-		padding: 2rem 0;
+		padding: 1.35rem 0 2rem;
+	}
+
+	.private-layout--typing {
+		gap: 1.2rem;
 	}
 
 	.private-layout__hero {
 		padding: 1.5rem 1.6rem;
+		border-radius: 24px;
 	}
 
 	.private-layout__hero h1 {

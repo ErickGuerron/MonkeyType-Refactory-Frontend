@@ -1,56 +1,33 @@
+---
 import PrivateLayout from '../layouts/PrivateLayout.astro';
 
-const sections = [
-	{
-		title: 'Behavior',
-		description: 'Definí cómo responde la sesión: ritmo, enfoque, feedback y densidad general.',
-		items: ['Quick restart', 'Confidence mode', 'Focus pause on error']
-	},
-	{
-		title: 'Input',
-		description: 'Preferencias de entrada, teclas rápidas y pequeños gestos para moverte más rápido.',
-		items: ['Stop on word', 'Loose space handling', 'Command shortcuts']
-	},
-	{
-		title: 'Sound',
-		description: 'Capas de audio discretas para confirmación, error y ambiente.',
-		items: ['Key hits', 'Error click', 'Ambient toggle']
-	},
-	{
-		title: 'Caret',
-		description: 'Ajustes del cursor para que se sienta más visible o más calmado.',
-		items: ['Block caret', 'Smooth blink', 'Trail intensity']
-	},
-	{
-		title: 'Appearance',
-		description: 'Escala visual, contraste y densidad del layout en pantalla.',
-		items: ['Font scale', 'High contrast', 'Compact stats']
-	},
-	{
-		title: 'Theme',
-		description: 'Variantes del mismo lenguaje oscuro y dorado para mantener identidad sin perder foco.',
-		items: ['Terminal gold', 'Muted amber', 'Night graphite']
-	},
-	{
-		title: 'Hide elements',
-		description: 'Controlá qué bloques querés ocultar cuando solo importa escribir.',
-		items: ['Hide tips', 'Hide extra metrics', 'Hide footer accents']
-	},
-	{
-		title: 'Danger zone',
-		description: 'Acciones sensibles y reversibles para la próxima etapa de producto.',
-		items: ['Clear local session', 'Reset visual profile', 'Sign out everywhere']
-	}
+const modeOptions = [
+	{ value: 'time', label: 'Time (30 segundos)' },
+	{ value: 'quote', label: 'Quote completa' },
+	{ value: 'words', label: 'Words' },
+	{ value: 'zen', label: 'Zen' },
+	{ value: 'custom', label: 'Custom' }
+];
+
+const languageOptions = [
+	{ value: 'english', label: 'English' },
+	{ value: 'spanish', label: 'Español' }
+];
+
+const themeOptions = [
+	{ value: 'system', label: 'System' },
+	{ value: 'dark', label: 'Dark' },
+	{ value: 'light', label: 'Light' }
 ];
 ---
 
 <PrivateLayout
 	title="MonkeyType | Settings"
-	description="Configuración privada de MonkeyType inspirada en la estructura general del producto."
+	description="Configuración privada de MonkeyType conectada a preferencias reales del backend."
 	activeHref="/settings"
 	pageEyebrow="Settings"
 	pageTitle="Ajustá la experiencia hasta que se sienta tuya."
-	pageDescription="La pantalla replica la lógica general de una configuración profunda: categorías claras, controles visuales y una zona sensible separada del resto."
+	pageDescription="La estructura visual sigue siendo profunda y ordenada, pero ahora theme, language, defaultMode, live WPM y sound se leen y persisten contra la API real."
 >
 	<section class="settings-page" data-settings-page>
 		<article class="terminal-panel settings-profile">
@@ -66,30 +43,99 @@ const sections = [
 
 		<div class="status-box is-visible" data-settings-status data-tone="info">Cargando preferencias...</div>
 
-		<section class="settings-grid">
-			{sections.map((section) => (
-				<article class:list={["terminal-panel", "settings-card", section.title === 'Danger zone' && 'is-danger']}>
-					<div class="settings-card__header">
-						<h3>{section.title}</h3>
-						<span>{section.items.length} opciones</span>
-					</div>
-					<p>{section.description}</p>
-					<ul>
-						{section.items.map((item) => (
-							<li>
-								<span>{item}</span>
-								<button type="button">Placeholder</button>
-							</li>
-						))}
-					</ul>
-				</article>
-			))}
-		</section>
+		<form class="settings-grid" data-preferences-form>
+			<article class="terminal-panel settings-card settings-card--form">
+				<div class="settings-card__header">
+					<h3>Experience</h3>
+					<span>Core</span>
+				</div>
+				<p>Lo esencial para que la home tipográfica llegue lista: tema, idioma y modo por defecto.</p>
+				<div class="settings-fields">
+					<label class="settings-field">
+						<span>Theme</span>
+						<select name="theme">
+							{themeOptions.map((option) => (
+								<option value={option.value}>{option.label}</option>
+							))}
+						</select>
+					</label>
+					<label class="settings-field">
+						<span>Language</span>
+						<select name="language">
+							{languageOptions.map((option) => (
+								<option value={option.value}>{option.label}</option>
+							))}
+						</select>
+					</label>
+					<label class="settings-field">
+						<span>Default mode</span>
+						<select name="defaultMode">
+							{modeOptions.map((option) => (
+								<option value={option.value}>{option.label}</option>
+							))}
+						</select>
+					</label>
+				</div>
+			</article>
+
+			<article class="terminal-panel settings-card settings-card--form">
+				<div class="settings-card__header">
+					<h3>Live feedback</h3>
+					<span>Runtime</span>
+				</div>
+				<p>Controlá cuánta señal aparece mientras escribís y si querés audio mínimo para error/success.</p>
+				<div class="settings-toggles">
+					<label class="settings-toggle">
+						<div>
+							<strong>Show live WPM</strong>
+							<p>Muestra u oculta la métrica viva en la pantalla principal.</p>
+						</div>
+						<input name="showLiveWpm" type="checkbox" />
+					</label>
+					<label class="settings-toggle">
+						<div>
+							<strong>Sound enabled</strong>
+							<p>Activa tonos sutiles para errores y finalización del test.</p>
+						</div>
+						<input name="soundEnabled" type="checkbox" />
+					</label>
+				</div>
+			</article>
+
+			<article class="terminal-panel settings-card">
+				<div class="settings-card__header">
+					<h3>Preview</h3>
+					<span>Now</span>
+				</div>
+				<p data-settings-summary>Theme system • english • time • live WPM on • sound off</p>
+				<ul class="settings-bullets">
+					<li><span>La home usa language + defaultMode para elegir quote y duración base.</span></li>
+					<li><span>Theme se aplica en caliente sobre el layout actual.</span></li>
+					<li><span>Los cambios se guardan con PATCH real a <code>/api/users/me/preferences</code>.</span></li>
+				</ul>
+			</article>
+
+			<article class="terminal-panel settings-card is-danger">
+				<div class="settings-card__header">
+					<h3>Danger zone</h3>
+					<span>Session</span>
+				</div>
+				<p>Mantenemos una zona sensible, pero sin humo: podés descartar cambios locales o cerrar sesión del dispositivo actual.</p>
+				<div class="settings-actions">
+					<button class="button-secondary" data-action="reset-form" type="button">Descartar cambios</button>
+					<button class="button-ghost" data-action="logout" type="button">Cerrar sesión</button>
+				</div>
+			</article>
+
+			<div class="settings-submit">
+				<button class="button-primary" data-action="save-preferences" type="submit">Guardar preferencias</button>
+			</div>
+		</form>
 	</section>
 </PrivateLayout>
 
 <script>
-	import { initSettingsPage } from '../scripts/auth-client';
+	import { initSettingsPage } from '../scripts/settings-page';
 
 	initSettingsPage();
 </script>
@@ -123,10 +169,15 @@ const sections = [
 		display: grid;
 		grid-template-columns: repeat(2, minmax(0, 1fr));
 		gap: 1rem;
+		align-items: start;
 	}
 
 	.settings-card {
 		padding: 1.35rem 1.4rem;
+	}
+
+	.settings-card--form {
+		min-height: 100%;
 	}
 
 	.settings-card__header {
@@ -155,62 +206,116 @@ const sections = [
 		color: var(--text-muted);
 	}
 
-	.settings-card ul {
+	.settings-fields,
+	.settings-toggles,
+	.settings-actions {
 		display: grid;
-		gap: 0.7rem;
-		margin: 0;
-		padding: 0;
-		list-style: none;
+		gap: 0.85rem;
 	}
 
-	.settings-card li {
+	.settings-field {
+		display: grid;
+		gap: 0.45rem;
+	}
+
+	.settings-field span,
+	.settings-toggle strong {
+		font-family: var(--font-mono);
+		font-size: 0.76rem;
+		letter-spacing: 0.14em;
+		text-transform: uppercase;
+		color: var(--text-dim);
+	}
+
+	.settings-field select {
+		min-height: 3rem;
+		padding: 0.8rem 0.95rem;
+		border: 1px solid rgba(255, 255, 255, 0.08);
+		border-radius: var(--radius-sm);
+		background: rgba(255, 255, 255, 0.03);
+		color: var(--text);
+	}
+
+	.settings-toggle {
 		display: flex;
 		justify-content: space-between;
 		gap: 1rem;
 		align-items: center;
-		padding: 0.85rem 0.95rem;
+		padding: 0.95rem 1rem;
 		border-radius: var(--radius-sm);
 		background: rgba(255, 255, 255, 0.03);
 		border: 1px solid rgba(255, 255, 255, 0.05);
 	}
 
-	.settings-card li span {
-		color: var(--text);
+	.settings-toggle p {
+		margin: 0.35rem 0 0;
+		font-size: 0.92rem;
 	}
 
-	.settings-card li button {
-		padding: 0.55rem 0.8rem;
-		border: 1px solid rgba(255, 255, 255, 0.08);
-		border-radius: 999px;
-		background: transparent;
+	.settings-toggle input {
+		width: 1.15rem;
+		height: 1.15rem;
+		accent-color: var(--accent);
+	}
+
+	.settings-bullets {
+		display: grid;
+		gap: 0.7rem;
+		margin: 0;
+		padding-left: 1rem;
 		color: var(--text-muted);
+	}
+
+	.settings-bullets code {
 		font-family: var(--font-mono);
-		font-size: 0.72rem;
-		letter-spacing: 0.12em;
-		text-transform: uppercase;
+		color: var(--accent-strong);
+	}
+
+	.settings-actions {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+
+	.settings-submit {
+		grid-column: 1 / -1;
+		display: flex;
+		justify-content: flex-end;
+	}
+
+	.settings-bullets li {
+		padding: 0;
+		background: transparent;
+		border: 0;
 	}
 
 	.settings-card.is-danger {
 		border-color: rgba(255, 143, 122, 0.25);
 	}
 
-	.settings-card.is-danger li button {
-		color: var(--danger);
-		border-color: rgba(255, 143, 122, 0.22);
-	}
-
 	@media (max-width: 900px) {
 		.settings-grid {
 			grid-template-columns: 1fr;
+		}
+
+		.settings-submit {
+			justify-content: stretch;
+		}
+
+		.settings-submit button {
+			width: 100%;
 		}
 	}
 
 	@media (max-width: 640px) {
 		.settings-profile,
-		.settings-card li,
-		.settings-card__header {
+		.settings-card__header,
+		.settings-toggle,
+		.settings-actions {
 			flex-direction: column;
 			align-items: stretch;
+		}
+
+		.settings-actions {
+			display: flex;
 		}
 	}
 </style>

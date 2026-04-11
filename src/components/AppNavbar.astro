@@ -16,29 +16,33 @@ const publicLinks = [
 	{ href: '/register', label: 'Register' }
 ];
 
-const privateLinks = [{ href: '/home', label: 'Home' }];
+const privateLinks = [
+	{ href: '/home', label: 'typing', icon: '⌨' },
+	{ href: '/settings', label: 'settings', icon: '⚙' }
+];
 
 const links = (mode === 'public' ? publicLinks : privateLinks).map((link) => ({
 	...link,
-	label: link.href === activeHref ? `[ ${link.label} ]` : link.label
+	isActive: link.href === activeHref
 }));
 ---
 
-<header class="app-navbar">
-	<div class="container app-navbar__inner terminal-panel">
-		<BrandMark />
+<header class:list={['app-navbar', mode === 'private' && 'is-private']}>
+	<div class:list={['container', 'app-navbar__inner', mode === 'public' && 'terminal-panel']}>
+		<BrandMark compact={mode === 'private'} minimal={mode === 'private'} />
 
 		<nav class="app-navbar__nav" aria-label="Principal">
 			{links.map((link) => (
-				<a href={link.href}>{link.label}</a>
+				<a class:list={[link.isActive && 'is-active']} href={link.href}>
+					{link.icon && <span aria-hidden="true">{link.icon}</span>}
+					{link.label}
+				</a>
 			))}
 		</nav>
 
 		{mode === 'private' && (
 			<div class="app-navbar__actions">
-				<a class:list={["app-navbar__settings", activeHref === '/settings' && 'is-active']} href="/settings" aria-label="Configuración" title="Configuración">
-					<span aria-hidden="true">⚙</span>
-				</a>
+				<span class="app-navbar__hint mono">monkey see monkey type</span>
 			</div>
 		)}
 	</div>
@@ -46,7 +50,11 @@ const links = (mode === 'public' ? publicLinks : privateLinks).map((link) => ({
 
 <style>
 	.app-navbar {
-		padding: 1.2rem 0 0;
+		padding: 1rem 0 0;
+	}
+
+	.app-navbar.is-private {
+		border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 	}
 
 	.app-navbar__inner {
@@ -54,66 +62,61 @@ const links = (mode === 'public' ? publicLinks : privateLinks).map((link) => ({
 		align-items: center;
 		justify-content: space-between;
 		gap: 1.25rem;
-		padding: 0.95rem 1rem;
-		border-radius: 999px;
+		padding: 0.7rem 0 0.85rem;
+	}
+
+	.app-navbar :global(.brand-mark) {
+		min-width: max-content;
 	}
 
 	.app-navbar__nav,
 	.app-navbar__actions {
 		display: flex;
 		align-items: center;
-		gap: 0.7rem;
+		gap: 0.45rem;
 	}
 
 	.app-navbar__nav a {
-		padding: 0.72rem 0.95rem;
+		display: inline-flex;
+		align-items: center;
+		gap: 0.5rem;
+		padding: 0.6rem 0.8rem;
 		border-radius: 999px;
 		font-family: var(--font-mono);
 		font-size: 0.74rem;
-		letter-spacing: 0.14em;
-		text-transform: uppercase;
+		letter-spacing: 0.1em;
+		text-transform: lowercase;
 		color: var(--text-muted);
-		transition: color 160ms ease, background-color 160ms ease;
+		transition: color 160ms ease, background-color 160ms ease, transform 160ms ease;
 	}
 
-	.app-navbar__nav a:hover {
-		background: rgba(224, 193, 109, 0.08);
+	.app-navbar__nav a:hover,
+	.app-navbar__nav a.is-active {
+		background: rgba(255, 255, 255, 0.04);
 		color: var(--accent);
-	}
-
-	.app-navbar__settings {
-		display: inline-flex;
-		align-items: center;
-		justify-content: center;
-		width: 2.85rem;
-		height: 2.85rem;
-		border-radius: 999px;
-		border: 1px solid rgba(255, 255, 255, 0.08);
-		background: rgba(255, 255, 255, 0.02);
-		color: var(--text-muted);
-		font-size: 1rem;
-		transition: color 160ms ease, border-color 160ms ease, background-color 160ms ease,
-			transform 160ms ease;
-	}
-
-	.app-navbar__settings:hover,
-	.app-navbar__settings.is-active {
-		color: var(--accent);
-		border-color: var(--border-strong);
-		background: rgba(224, 193, 109, 0.08);
 		transform: translateY(-1px);
+	}
+
+	.app-navbar__hint {
+		color: var(--text-dim);
+		font-size: 0.68rem;
+		letter-spacing: 0.16em;
+		text-transform: uppercase;
+	}
+
+	.app-navbar__nav a span {
+		font-size: 0.92rem;
 	}
 
 	@media (max-width: 960px) {
 		.app-navbar__inner {
-			border-radius: 28px;
 			flex-wrap: wrap;
 		}
 
 		.app-navbar__nav {
 			order: 3;
 			width: 100%;
-			justify-content: space-between;
+			justify-content: flex-start;
 			padding-top: 0.35rem;
 			border-top: 1px solid rgba(255, 255, 255, 0.06);
 		}
@@ -139,10 +142,6 @@ const links = (mode === 'public' ? publicLinks : privateLinks).map((link) => ({
 		.app-navbar__actions {
 			width: 100%;
 			justify-content: center;
-		}
-
-		.app-navbar__actions a {
-			width: 2.85rem;
 		}
 	}
 </style>
