@@ -1,0 +1,25 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="MonkeyType | Redirecting" description="Redirección interna a la nueva ruta privada principal.">
+	<div class="redirect-page">
+		<p>Redirigiendo a tu nuevo home privado...</p>
+	</div>
+
+	<script>
+		window.location.replace('/home');
+	</script>
+</Layout>
+
+<style>
+	.redirect-page {
+		min-height: 100vh;
+		display: grid;
+		place-items: center;
+		color: var(--text-muted);
+		font-family: var(--font-mono);
+		letter-spacing: 0.12em;
+		text-transform: uppercase;
+	}
+</style>

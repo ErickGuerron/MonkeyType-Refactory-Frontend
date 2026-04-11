@@ -1,0 +1,21 @@
+---
+import AuthForm from '../components/auth/AuthForm.astro';
+import AuthLayout from '../layouts/AuthLayout.astro';
+---
+
+<AuthLayout
+	title="MonkeyType | Register"
+	description="Creá tu cuenta en MonkeyType."
+	activeHref="/register"
+>
+	<AuthForm
+		mode="register"
+		title="Crear cuenta"
+		description="Completá los datos para registrarte."
+		submitLabel="Crear cuenta"
+		links={[
+			{ href: '/login', label: 'Ya tengo cuenta' },
+			{ href: '/reset-password', label: 'Necesito recuperar acceso' }
+		]}
+	/>
+</AuthLayout>

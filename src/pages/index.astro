@@ -1,11 +1,131 @@
 ---
-import Welcome from '../components/Welcome.astro';
+import AppFooter from '../components/AppFooter.astro';
+import AppNavbar from '../components/AppNavbar.astro';
 import Layout from '../layouts/Layout.astro';
-
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
 ---
 
-<Layout>
-	<Welcome />
+
+<Layout title="MonkeyType | Landing" description="MonkeyType para escribir con foco, entrar a tu cuenta y seguir tu ritmo.">
+	<div class="page-shell">
+		<AppNavbar mode="public" activeHref="/" />
+
+		<main class="landing container">
+			<section class="landing__hero terminal-panel">
+				<div>
+					<span class="eyebrow">Typing focus</span>
+					<h1>Escribí con ritmo, medí tu progreso y dejá tu cuenta siempre lista.</h1>
+					<p>
+						MonkeyType te recibe con una experiencia minimal, oscura y directa al punto: entrar,
+						practicar, volver a tu espacio y ajustar cómo querés sentir cada sesión.
+					</p>
+				</div>
+
+				<div class="landing__actions">
+					<a class="button-primary" href="/register">Crear cuenta</a>
+					<a class="button-secondary" href="/login">Entrar</a>
+					<a class="button-ghost" href="/home">Ir a mi espacio</a>
+				</div>
+			</section>
+
+			<section class="landing__grid panel-grid">
+				<article class="landing__card terminal-panel">
+					<h2>Tu recorrido</h2>
+					<ul>
+						<li>Landing pública para descubrir la experiencia.</li>
+						<li>Login y registro para entrar a tu cuenta.</li>
+						<li>Home privada para retomar tu sesión.</li>
+						<li>Configuración para ajustar tu estilo.</li>
+					</ul>
+				</article>
+
+				<article class="landing__card terminal-panel">
+					<h2>Qué encontrás</h2>
+					<p>Una estética terminal cálida, foco visual alto y un flujo pensado para volver rápido a escribir.</p>
+				</article>
+
+				<article class="landing__card terminal-panel">
+					<h2>Cuenta y ajustes</h2>
+					<p>
+						Una vez adentro tenés un home privado y una pantalla de configuración con secciones para
+						comportamiento, apariencia y preferencias generales.
+					</p>
+				</article>
+			</section>
+		</main>
+
+		<AppFooter />
+	</div>
 </Layout>
+
+<style>
+	.landing {
+		display: grid;
+		gap: 1.4rem;
+		flex: 1;
+		padding: 2rem 0;
+	}
+
+	.landing__hero,
+	.landing__card {
+		padding: 1.6rem;
+	}
+
+	.landing__hero {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) auto;
+		gap: 1.5rem;
+		align-items: end;
+	}
+
+	.landing__hero h1 {
+		margin: 1rem 0;
+		max-width: 15ch;
+		font-family: var(--font-display);
+		font-size: clamp(2.7rem, 6vw, 5rem);
+		line-height: 0.96;
+	}
+
+	.landing__hero p,
+	.landing__card p,
+	.landing__card li {
+		margin: 0;
+		color: var(--text-muted);
+	}
+
+	.landing__actions {
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: flex-end;
+		gap: 0.8rem;
+	}
+
+	.landing__grid {
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+	}
+
+	.landing__card h2 {
+		margin: 0 0 1rem;
+		font-family: var(--font-display);
+		font-size: 1.3rem;
+	}
+
+	.landing__card ul {
+		margin: 0;
+		padding-left: 1rem;
+	}
+
+	.landing__card a:hover {
+		color: var(--accent);
+	}
+
+	@media (max-width: 900px) {
+		.landing__hero,
+		.landing__grid {
+			grid-template-columns: 1fr;
+		}
+
+		.landing__actions {
+			justify-content: flex-start;
+		}
+	}
+</style>

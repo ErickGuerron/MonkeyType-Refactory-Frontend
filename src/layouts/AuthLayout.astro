@@ -1,0 +1,57 @@
+---
+import AppFooter from '../components/AppFooter.astro';
+import AppNavbar from '../components/AppNavbar.astro';
+import Layout from './Layout.astro';
+
+interface Props {
+	title: string;
+	description: string;
+	activeHref?: string;
+}
+
+const {
+	title,
+	description,
+	activeHref = '/login'
+} = Astro.props;
+---
+
+<Layout title={title} description={description} bodyClass="theme-auth">
+	<div class="page-shell">
+		<AppNavbar mode="public" activeHref={activeHref} />
+
+		<main class="auth-layout container">
+			<section class="auth-layout__panel">
+				<slot />
+			</section>
+		</main>
+
+		<AppFooter />
+	</div>
+</Layout>
+
+<style>
+	.auth-layout {
+		display: flex;
+		flex: 1;
+		align-items: center;
+		justify-content: center;
+		padding: 2.5rem 0 2rem;
+	}
+
+	.auth-layout__panel {
+		display: flex;
+		justify-content: center;
+		width: 100%;
+	}
+
+	.auth-layout__panel :global(.auth-form) {
+		max-width: 30rem;
+	}
+
+	@media (max-width: 720px) {
+		.auth-layout {
+			padding-top: 1.5rem;
+		}
+	}
+</style>

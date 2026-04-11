@@ -1,0 +1,81 @@
+---
+import { API_BASE_URL } from '../lib/auth-api';
+
+const docsUrl = `${API_BASE_URL}/docs`;
+const healthUrl = `${API_BASE_URL}/health`;
+---
+
+<footer class="app-footer">
+	<div class="container app-footer__inner">
+		<div>
+			<p class="app-footer__title">MonkeyType / Focused typing</p>
+			<p class="app-footer__copy">
+				Una experiencia oscura, sobria y lista para entrar, practicar y ajustar tu espacio de escritura.
+			</p>
+		</div>
+
+		<div class="app-footer__links mono">
+			<a href={docsUrl} target="_blank" rel="noreferrer">API docs</a>
+			<a href={healthUrl} target="_blank" rel="noreferrer">Health</a>
+		</div>
+	</div>
+</footer>
+
+<style>
+	.app-footer {
+		padding: 1.2rem 0 2rem;
+	}
+
+	.app-footer__inner {
+		display: flex;
+		justify-content: space-between;
+		gap: 1rem 2rem;
+		padding-top: 1rem;
+		border-top: 1px solid rgba(255, 255, 255, 0.08);
+	}
+
+	.app-footer__title {
+		margin: 0;
+		font-family: var(--font-mono);
+		font-size: 0.78rem;
+		letter-spacing: 0.14em;
+		text-transform: uppercase;
+		color: var(--accent);
+	}
+
+	.app-footer__copy {
+		margin: 0.4rem 0 0;
+		max-width: 38rem;
+		color: var(--text-dim);
+		font-size: 0.92rem;
+	}
+
+	.app-footer__links {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: flex-start;
+		justify-content: flex-end;
+		gap: 0.9rem;
+		font-size: 0.78rem;
+		letter-spacing: 0.12em;
+		text-transform: uppercase;
+	}
+
+	.app-footer__links a {
+		color: var(--text-muted);
+	}
+
+	.app-footer__links a:hover {
+		color: var(--accent);
+	}
+
+	@media (max-width: 720px) {
+		.app-footer__inner {
+			flex-direction: column;
+		}
+
+		.app-footer__links {
+			justify-content: flex-start;
+		}
+	}
+</style>

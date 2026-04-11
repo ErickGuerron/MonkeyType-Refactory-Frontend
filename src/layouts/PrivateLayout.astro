@@ -1,0 +1,68 @@
+---
+import AppFooter from '../components/AppFooter.astro';
+import AppNavbar from '../components/AppNavbar.astro';
+import Layout from './Layout.astro';
+
+interface Props {
+	title: string;
+	description: string;
+	activeHref?: string;
+	pageEyebrow?: string;
+	pageTitle: string;
+	pageDescription: string;
+}
+
+const {
+	title,
+	description,
+	activeHref = '/home',
+	pageEyebrow = 'Private area',
+	pageTitle,
+	pageDescription
+} = Astro.props;
+---
+
+<Layout title={title} description={description} bodyClass="theme-private">
+	<div class="page-shell">
+		<AppNavbar mode="private" activeHref={activeHref} />
+
+		<main class="private-layout container">
+			<section class="private-layout__hero terminal-panel">
+				<span class="eyebrow">{pageEyebrow}</span>
+				<h1>{pageTitle}</h1>
+				<p>{pageDescription}</p>
+			</section>
+
+			<slot />
+		</main>
+
+		<AppFooter />
+	</div>
+</Layout>
+
+<style>
+	.private-layout {
+		display: grid;
+		gap: 1rem;
+		flex: 1;
+		padding: 2rem 0;
+	}
+
+	.private-layout__hero {
+		padding: 1.5rem 1.6rem;
+	}
+
+	.private-layout__hero h1 {
+		margin: 1rem 0 0.8rem;
+		max-width: 12ch;
+		font-family: var(--font-display);
+		font-size: clamp(2.8rem, 6vw, 4.8rem);
+		line-height: 0.95;
+	}
+
+	.private-layout__hero p {
+		margin: 0;
+		max-width: 48rem;
+		color: var(--text-muted);
+	}
+</style>

@@ -1,0 +1,135 @@
+---
+import { initAppShell } from '../scripts/auth-client';
+import PrivateLayout from '../layouts/PrivateLayout.astro';
+---
+
+<PrivateLayout
+	title="MonkeyType | Home"
+	description="Home privada de MonkeyType con estado de sesión y acceso a configuración."
+	activeHref="/home"
+	pageEyebrow="Account home"
+	pageTitle="Tu espacio privado para volver a escribir sin fricción."
+	pageDescription="Acá retomás tu cuenta, verificás que tu sesión siga viva y saltás a configuración cuando quieras ajustar la experiencia."
+>
+	<section class="home-grid">
+		<article class="terminal-panel home-card" data-app-shell>
+			<div class="home-card__header">
+				<h2>Estado de sesión</h2>
+				<button class="button-ghost" data-action="logout" type="button">Cerrar sesión</button>
+			</div>
+
+			<div class="status-box is-visible" data-app-status data-tone="info">Inicializando home privado...</div>
+
+			<dl class="home-card__details">
+				<div>
+					<dt>Usuario</dt>
+					<dd data-user-name>—</dd>
+				</div>
+				<div>
+					<dt>Email</dt>
+					<dd data-user-email>—</dd>
+				</div>
+				<div>
+					<dt>Persistencia</dt>
+					<dd data-user-stored>—</dd>
+				</div>
+				<div>
+					<dt>Token preview</dt>
+					<dd class="mono" data-token-value>—</dd>
+				</div>
+			</dl>
+		</article>
+
+		<article class="terminal-panel home-card">
+			<h2>Accesos rápidos</h2>
+			<div class="home-card__actions">
+				<a class="button-primary" href="/settings">Abrir configuración</a>
+				<a class="button-secondary" data-api-link href="http://localhost:3000/api/docs" target="_blank" rel="noreferrer">API docs</a>
+			</div>
+			<ul>
+				<li>Entrá a los ajustes generales desde el engranaje o desde este panel.</li>
+				<li>La sesión se valida contra la API actual antes de quedarse en la vista privada.</li>
+				<li>Si el token no sirve, la app limpia la sesión y vuelve a login.</li>
+			</ul>
+		</article>
+	</section>
+</PrivateLayout>
+
+<script type="module">
+	initAppShell();
+</script>
+
+<style>
+	.home-grid {
+		display: grid;
+		grid-template-columns: 1.15fr 0.85fr;
+		gap: 1rem;
+	}
+
+	.home-card {
+		padding: 1.6rem;
+	}
+
+	.home-card h2 {
+		margin: 0 0 1rem;
+		font-family: var(--font-display);
+	}
+
+	.home-card__header {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		gap: 1rem;
+	}
+
+	.home-card__details {
+		display: grid;
+		gap: 1rem;
+		margin: 0;
+	}
+
+	.home-card__details div {
+		padding-bottom: 0.9rem;
+		border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+	}
+
+	.home-card__details dt {
+		margin-bottom: 0.35rem;
+		font-family: var(--font-mono);
+		font-size: 0.72rem;
+		letter-spacing: 0.18em;
+		text-transform: uppercase;
+		color: var(--text-dim);
+	}
+
+	.home-card__details dd {
+		margin: 0;
+		color: var(--text);
+	}
+
+	.home-card__actions {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.8rem;
+		margin-bottom: 1rem;
+	}
+
+	.home-card ul {
+		margin: 0;
+		padding-left: 1rem;
+		color: var(--text-muted);
+	}
+
+	@media (max-width: 900px) {
+		.home-grid {
+			grid-template-columns: 1fr;
+		}
+	}
+
+	@media (max-width: 640px) {
+		.home-card__header {
+			flex-direction: column;
+			align-items: stretch;
+		}
+	}
+</style>

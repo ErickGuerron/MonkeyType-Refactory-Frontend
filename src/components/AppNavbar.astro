@@ -1,0 +1,148 @@
+---
+import BrandMark from './BrandMark.astro';
+
+type NavbarMode = 'public' | 'private';
+
+interface Props {
+	mode?: NavbarMode;
+	activeHref?: string;
+}
+
+const { mode = 'public', activeHref = '/' } = Astro.props;
+
+const publicLinks = [
+	{ href: '/', label: 'Home' },
+	{ href: '/login', label: 'Login' },
+	{ href: '/register', label: 'Register' }
+];
+
+const privateLinks = [{ href: '/home', label: 'Home' }];
+
+const links = (mode === 'public' ? publicLinks : privateLinks).map((link) => ({
+	...link,
+	label: link.href === activeHref ? `[ ${link.label} ]` : link.label
+}));
+---
+
+<header class="app-navbar">
+	<div class="container app-navbar__inner terminal-panel">
+		<BrandMark />
+
+		<nav class="app-navbar__nav" aria-label="Principal">
+			{links.map((link) => (
+				<a href={link.href}>{link.label}</a>
+			))}
+		</nav>
+
+		{mode === 'private' && (
+			<div class="app-navbar__actions">
+				<a class:list={["app-navbar__settings", activeHref === '/settings' && 'is-active']} href="/settings" aria-label="Configuración" title="Configuración">
+					<span aria-hidden="true">⚙</span>
+				</a>
+			</div>
+		)}
+	</div>
+</header>
+
+<style>
+	.app-navbar {
+		padding: 1.2rem 0 0;
+	}
+
+	.app-navbar__inner {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 1.25rem;
+		padding: 0.95rem 1rem;
+		border-radius: 999px;
+	}
+
+	.app-navbar__nav,
+	.app-navbar__actions {
+		display: flex;
+		align-items: center;
+		gap: 0.7rem;
+	}
+
+	.app-navbar__nav a {
+		padding: 0.72rem 0.95rem;
+		border-radius: 999px;
+		font-family: var(--font-mono);
+		font-size: 0.74rem;
+		letter-spacing: 0.14em;
+		text-transform: uppercase;
+		color: var(--text-muted);
+		transition: color 160ms ease, background-color 160ms ease;
+	}
+
+	.app-navbar__nav a:hover {
+		background: rgba(224, 193, 109, 0.08);
+		color: var(--accent);
+	}
+
+	.app-navbar__settings {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: 2.85rem;
+		height: 2.85rem;
+		border-radius: 999px;
+		border: 1px solid rgba(255, 255, 255, 0.08);
+		background: rgba(255, 255, 255, 0.02);
+		color: var(--text-muted);
+		font-size: 1rem;
+		transition: color 160ms ease, border-color 160ms ease, background-color 160ms ease,
+			transform 160ms ease;
+	}
+
+	.app-navbar__settings:hover,
+	.app-navbar__settings.is-active {
+		color: var(--accent);
+		border-color: var(--border-strong);
+		background: rgba(224, 193, 109, 0.08);
+		transform: translateY(-1px);
+	}
+
+	@media (max-width: 960px) {
+		.app-navbar__inner {
+			border-radius: 28px;
+			flex-wrap: wrap;
+		}
+
+		.app-navbar__nav {
+			order: 3;
+			width: 100%;
+			justify-content: space-between;
+			padding-top: 0.35rem;
+			border-top: 1px solid rgba(255, 255, 255, 0.06);
+		}
+	}
+
+	@media (max-width: 640px) {
+		.app-navbar__inner,
+		.app-navbar__actions,
+		.app-navbar__nav {
+			align-items: stretch;
+		}
+
+		.app-navbar__inner,
+		.app-navbar__actions {
+			flex-direction: column;
+		}
+
+		.app-navbar__nav {
+			flex-wrap: wrap;
+			justify-content: center;
+		}
+
+		.app-navbar__actions {
+			width: 100%;
+			justify-content: center;
+		}
+
+		.app-navbar__actions a {
+			width: 2.85rem;
+		}
+	}
+</style>
