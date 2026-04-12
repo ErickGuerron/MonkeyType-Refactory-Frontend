@@ -1,591 +1,970 @@
 <section class="typing-page" data-typing-page>
-	<div class="status-box" data-typing-status data-tone="info"></div>
+  <div class="status-box" data-typing-status data-tone="info"></div>
 
-	<section class="typing-config terminal-panel" aria-label="Configuración rápida">
-		<div class="typing-config__group">
-			<span class="typing-config__label">mode</span>
-			<div class="typing-config__chips">
-				<button class="typing-chip" data-pref-key="defaultMode" data-pref-value="time" type="button">time 30</button>
-				<button class="typing-chip" data-pref-key="defaultMode" data-pref-value="quote" type="button">quote</button>
-				<button class="typing-chip" data-pref-key="defaultMode" data-pref-value="words" type="button">words</button>
-				<button class="typing-chip" data-pref-key="defaultMode" data-pref-value="zen" type="button">zen</button>
-			</div>
-		</div>
+  <section
+    class="typing-config terminal-panel"
+    aria-label="Configuración rápida"
+  >
+    <div class="typing-config__group">
+      <span class="typing-config__label">mode</span>
+      <div class="typing-config__chips">
+        <label class="typing-config__select-shell typing-config__select-shell--chip">
+          <select class="typing-config__select typing-config__select--chip" data-pref-select="timeMode" aria-label="Seleccionar modo tiempo">
+            <option value="30">time 30</option>
+            <option value="60">time 60</option>
+            <option value="120">time 120</option>
+          </select>
+        </label>
+        <button
+          class="typing-chip"
+          data-pref-key="defaultMode"
+          data-pref-value="quote"
+          type="button">quote</button
+        >
+        <button
+          class="typing-chip"
+          data-pref-key="defaultMode"
+          data-pref-value="words"
+          type="button">words</button
+        >
+        <button
+          class="typing-chip"
+          data-pref-key="defaultMode"
+          data-pref-value="zen"
+          type="button">zen</button
+        >
+      </div>
 
-		<div class="typing-config__group">
-			<span class="typing-config__label">language</span>
-			<div class="typing-config__chips">
-				<button class="typing-chip" data-pref-key="language" data-pref-value="english" type="button">english</button>
-				<button class="typing-chip" data-pref-key="language" data-pref-value="spanish" type="button">español</button>
-			</div>
-		</div>
+      <div class="typing-config__chips" data-words-config hidden>
+        <span class="typing-config__micro-label">words</span>
+        <button class="typing-chip" data-word-count="50" type="button">50</button>
+        <button class="typing-chip" data-word-count="100" type="button">100</button>
+        <button class="typing-chip" data-word-count="150" type="button">150</button>
+      </div>
+    </div>
 
-		<div class="typing-config__group is-utility">
-			<span class="typing-config__label">signals</span>
-			<div class="typing-config__chips">
-				<button class="typing-chip" data-pref-key="showLiveWpm" data-pref-toggle="true" type="button">live wpm</button>
-				<button class="typing-chip" data-pref-key="soundEnabled" data-pref-toggle="true" type="button">sound</button>
-				<a class="typing-chip typing-chip--link" href="/settings">settings</a>
-			</div>
-		</div>
-	</section>
+    <div class="typing-config__group">
+      <span class="typing-config__label">language</span>
+      <label class="typing-config__select-shell">
+        <select class="typing-config__select" data-pref-select="language" aria-label="Seleccionar idioma">
+          <option value="english">english</option>
+          <option value="spanish">español</option>
+        </select>
+      </label>
+    </div>
 
-	<section class="typing-stage" aria-label="Typing test principal">
-		<header class="typing-stage__hud">
-			<div>
-				<p class="typing-stage__timer-label">time</p>
-				<strong class="typing-stage__timer" data-stat="timer">30s</strong>
-			</div>
+    <div class="typing-config__group is-utility">
+      <span class="typing-config__label">signals</span>
+      <div class="typing-config__chips">
+        <button
+          class="typing-chip"
+          data-pref-key="showLiveWpm"
+          data-pref-toggle="true"
+          type="button">live wpm</button
+        >
+        <button
+          class="typing-chip"
+          data-pref-key="soundEnabled"
+          data-pref-toggle="true"
+          type="button">sound</button
+        >
+        <a class="typing-chip typing-chip--link" href="/settings">settings</a>
+      </div>
+    </div>
+  </section>
 
-			<div class="typing-stage__summary">
-				<span class="typing-inline-stat" data-current-mode>time 30s</span>
-				<span class="typing-inline-stat" data-current-language>english</span>
-				<span class="typing-inline-stat" data-live-wpm-card>
-					live
-					<strong data-stat="wpm">0</strong>
-				</span>
-			</div>
-		</header>
+  <section class="typing-stage" aria-label="Typing test principal">
+    <header class="typing-stage__hud">
+      <div>
+        <p class="typing-stage__timer-label">time</p>
+        <strong class="typing-stage__timer" data-stat="timer">30s</strong>
+      </div>
 
-		<div class="typing-stage__center">
-			<p class="typing-stage__source mono" data-quote-source>Quote backend • English</p>
-			<label class="typing-stage__surface" data-quote-surface aria-label="Entrada principal de typing">
-				<div class="typing-stage__panning" data-typing-panning>
-					<div class="typing-stage__quote" data-action="focus-input" data-quote-text></div>
-					<textarea
-						class="typing-stage__overlay-input"
-						data-typing-input
-						spellcheck="false"
-						autocomplete="off"
-						autocorrect="off"
-						autocapitalize="off"
-						placeholder=""
-					></textarea>
-					<div class="typing-stage__caret" data-typing-caret></div>
-				</div>
-			</label>
-		</div>
+      <div class="typing-stage__summary">
+        <span class="typing-inline-stat" data-current-mode>time 30s</span>
+        <span class="typing-inline-stat" data-current-language>english</span>
+        <span class="typing-inline-stat" data-live-wpm-card>
+          live
+          <strong data-stat="wpm">0</strong>
+        </span>
+      </div>
+    </header>
 
-		<div class="typing-stage__input-shell" aria-label="Ayuda visual de typing">
-			<span class="typing-stage__input-hint mono">type directly over the quote and keep your focus in the line</span>
-		</div>
+    <div class="typing-stage__center">
+      <p class="typing-stage__source mono" data-quote-source>
+        Quote backend • English
+      </p>
+      <label
+        class="typing-stage__surface"
+        data-quote-surface
+        aria-label="Entrada principal de typing"
+      >
+        <div class="typing-stage__panning" data-typing-panning>
+          <div
+            class="typing-stage__quote"
+            data-action="focus-input"
+            data-quote-text
+          >
+          </div>
+          <textarea
+            class="typing-stage__overlay-input"
+            data-typing-input
+            spellcheck="false"
+            autocomplete="off"
+            autocorrect="off"
+            autocapitalize="off"
+            placeholder=""></textarea>
+          <div class="typing-stage__caret" data-typing-caret></div>
+        </div>
+      </label>
+    </div>
 
-		<footer class="typing-stage__footer">
-			<div class="typing-stage__stats">
-				<div class="typing-stage__stat">
-					<span>raw</span>
-					<strong data-stat="raw">0</strong>
-				</div>
-				<div class="typing-stage__stat">
-					<span>acc</span>
-					<strong data-stat="accuracy">100%</strong>
-				</div>
-			</div>
+    <div class="typing-stage__input-shell" aria-label="Ayuda visual de typing">
+      <span class="typing-stage__input-hint mono" data-typing-hint
+        >type directly over the quote and keep your focus in the line</span
+      >
+    </div>
 
-			<div class="typing-stage__actions">
-				<button class="typing-action" data-action="restart" type="button">restart</button>
-				<button class="typing-action" data-action="next-quote" type="button">next</button>
-				<button class="typing-action" data-action="focus-input" type="button">focus</button>
-			</div>
-		</footer>
+    <footer class="typing-stage__footer">
+      <div class="typing-stage__stats">
+        <div class="typing-stage__stat">
+          <span>raw</span>
+          <strong data-stat="raw">0</strong>
+        </div>
+        <div class="typing-stage__stat">
+          <span>acc</span>
+          <strong data-stat="accuracy">100%</strong>
+        </div>
+      </div>
 
-		<section class="typing-result terminal-panel" data-result-card hidden>
-			<div class="typing-result__header">
-				<div>
-					<p class="typing-result__eyebrow">test completed</p>
-					<h2 data-result-title>Resultado guardado</h2>
-				</div>
-				<p data-result-summary></p>
-			</div>
+      <div class="typing-stage__actions">
+        <button class="typing-action" data-action="restart" type="button"
+          >restart</button
+        >
+        <button class="typing-action" data-action="next-quote" type="button"
+          >next</button
+        >
+        <button class="typing-action" data-action="focus-input" type="button"
+          >focus</button
+        >
+        <button class="typing-action" data-action="finish-zen" type="button" hidden
+          >finish zen</button
+        >
+      </div>
+    </footer>
 
-			<div class="typing-result__metrics">
-				<article>
-					<span>wpm</span>
-					<strong data-result-metric="wpm">0</strong>
-				</article>
-				<article>
-					<span>raw</span>
-					<strong data-result-metric="raw">0</strong>
-				</article>
-				<article>
-					<span>acc</span>
-					<strong data-result-metric="accuracy">100%</strong>
-				</article>
-				<article>
-					<span>time</span>
-					<strong data-result-metric="time">30s</strong>
-				</article>
-			</div>
+    <section class="typing-result-modal" data-result-card hidden>
+      <div class="typing-result-modal__backdrop" data-action="close-result"></div>
+      <div class="typing-result terminal-panel" role="dialog" aria-modal="true" aria-labelledby="typing-result-title">
+        <div class="typing-result__header">
+          <div>
+            <p class="typing-result__eyebrow">test completed</p>
+            <h2 id="typing-result-title" data-result-title>Resultado guardado</h2>
+          </div>
+          <p data-result-summary></p>
+        </div>
 
-			<div class="typing-result__actions">
-				<button class="button-secondary" data-action="restart" type="button">reintentar</button>
-				<button class="button-primary" data-action="next-quote" type="button">siguiente test</button>
-			</div>
-		</section>
-	</section>
+        <div class="typing-result__body">
+          <aside class="typing-result__hero-metrics">
+            <article class="typing-result__hero-block">
+              <span>wpm</span>
+              <strong data-result-metric="wpm">0</strong>
+            </article>
+            <article class="typing-result__hero-block">
+              <span>acc</span>
+              <strong data-result-metric="accuracy">100%</strong>
+            </article>
+          </aside>
 
-	<section class="typing-rail">
-		<article class="typing-rail__card terminal-panel">
-			<div class="typing-rail__header">
-				<div>
-					<p class="typing-rail__eyebrow">profile</p>
-					<h3 data-home-user-name>—</h3>
-					<p data-home-user-email>—</p>
-				</div>
-				<button class="typing-action" data-action="logout" type="button">logout</button>
-			</div>
-			<p class="typing-rail__copy">La home vuelve a poner la escritura al centro, pero mantiene quotes, resultados y preferencias conectados al backend actual.</p>
-		</article>
+          <div class="typing-result__graph-shell">
+            <div class="typing-result__graph-head">
+              <span>run graph</span>
+              <strong data-result-chart-value>100%</strong>
+            </div>
+            <div class="typing-result__graph" data-result-chart-shell>
+              <canvas data-result-chart aria-label="Gráfico del resultado"></canvas>
+            </div>
+            <div class="typing-result__legend">
+              <span><i class="is-wpm"></i>wpm</span>
+              <span><i class="is-raw"></i>raw</span>
+              <span><i class="is-burst"></i>burst</span>
+              <span><i class="is-errors"></i>errors</span>
+            </div>
+          </div>
+        </div>
 
-		<article class="typing-rail__card terminal-panel">
-			<div class="typing-rail__header is-compact">
-				<div>
-					<p class="typing-rail__eyebrow">recent results</p>
-					<h3>historial</h3>
-				</div>
-				<a class="typing-inline-link" href="/settings">preferencias</a>
-			</div>
-			<ul class="typing-history" data-history-list></ul>
-		</article>
-	</section>
+        <div class="typing-result__summary-grid">
+          <article class="typing-result__summary-item">
+            <span>raw</span>
+            <strong data-result-metric="raw">0</strong>
+          </article>
+          <article class="typing-result__summary-item">
+            <span>time</span>
+            <strong data-result-metric="time">30s</strong>
+          </article>
+          <article class="typing-result__summary-item">
+            <span>mode</span>
+            <strong data-result-meta="mode">time 30</strong>
+          </article>
+          <article class="typing-result__summary-item">
+            <span>language</span>
+            <strong data-result-meta="language">english</strong>
+          </article>
+        </div>
 
-	<footer class="typing-shortcuts" aria-label="Atajos visuales">
-		<span><kbd>esc</kbd> restart</span>
-		<span><kbd>tab</kbd> focus input</span>
-		<span><kbd>enter</kbd> next test after result</span>
-	</footer>
+        <div class="typing-result__actions">
+          <button class="button-secondary" data-action="close-result" type="button">cerrar</button>
+          <button class="button-primary" data-action="next-quote" type="button">siguiente test</button>
+        </div>
+      </div>
+    </section>
+  </section>
+
+  <section class="typing-rail">
+    <article class="typing-rail__card terminal-panel">
+      <div class="typing-rail__header">
+        <div>
+          <p class="typing-rail__eyebrow">profile</p>
+          <h3 data-home-user-name>—</h3>
+          <p data-home-user-email>—</p>
+        </div>
+        <button class="typing-action" data-action="logout" type="button"
+          >logout</button
+        >
+      </div>
+      <p class="typing-rail__copy">
+        La home vuelve a poner la escritura al centro, pero mantiene quotes,
+        resultados y preferencias conectados al backend actual.
+      </p>
+    </article>
+
+    <article class="typing-rail__card terminal-panel">
+      <div class="typing-rail__header is-compact">
+        <div>
+          <p class="typing-rail__eyebrow">recent results</p>
+          <h3>historial</h3>
+        </div>
+        <a class="typing-inline-link" href="/settings">preferencias</a>
+      </div>
+      <ul class="typing-history" data-history-list></ul>
+    </article>
+  </section>
+
+  <footer class="typing-shortcuts" aria-label="Atajos visuales">
+    <span><kbd>esc</kbd> restart</span>
+    <span><kbd>tab</kbd> focus input</span>
+    <span><kbd>enter</kbd> next test after result</span>
+    <span><kbd>ctrl</kbd> + <kbd>enter</kbd> finish zen</span>
+  </footer>
 </section>
 
 <style>
-	.typing-page {
-		display: grid;
-		gap: 1.2rem;
-	}
+  .typing-page {
+    display: grid;
+    gap: 1.2rem;
+  }
 
-	.typing-config {
-		display: grid;
-		grid-template-columns: repeat(3, minmax(0, 1fr));
-		gap: 1rem;
-		padding: 0.9rem 1.15rem;
-		border-radius: 22px;
-	}
+  .typing-config {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.85rem;
+    padding: 0.7rem 0.9rem;
+    border-radius: 18px;
+  }
 
-	.typing-config__group {
-		display: grid;
-		gap: 0.55rem;
-	}
+  .typing-config__group {
+    display: grid;
+    gap: 0.55rem;
+  }
 
-	.typing-config__group.is-utility {
-		justify-self: end;
-	}
+  .typing-config__group.is-utility {
+    justify-self: end;
+  }
 
-	.typing-config__label,
-	.typing-result__eyebrow,
-	.typing-rail__eyebrow,
-	.typing-stage__timer-label {
-		margin: 0;
-		font-family: var(--font-mono);
-		font-size: 0.7rem;
-		letter-spacing: 0.16em;
-		text-transform: uppercase;
-		color: var(--text-dim);
+  .typing-config__label,
+  .typing-config__micro-label,
+  .typing-result__eyebrow,
+  .typing-rail__eyebrow,
+  .typing-stage__timer-label {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+  }
+
+	.typing-config__micro-label {
+		display: inline-flex;
+		align-items: center;
+		padding-inline: 0.15rem;
 	}
 
 	.typing-config__chips {
 		display: flex;
 		flex-wrap: wrap;
-		gap: 0.45rem;
+		gap: 0.35rem;
 	}
 
-	.typing-chip {
-		display: inline-flex;
-		align-items: center;
-		justify-content: center;
-		min-height: 2.2rem;
-		padding: 0.55rem 0.8rem;
-		border: 0;
-		border-radius: 999px;
-		background: transparent;
+	.typing-config__select-shell {
+		position: relative;
+		display: block;
+	}
+
+	.typing-config__select-shell--chip {
+		min-width: fit-content;
+	}
+
+	.typing-config__select-shell::after {
+		content: '⌄';
+		position: absolute;
+		right: 0.7rem;
+		top: 50%;
+		transform: translateY(-52%);
+		pointer-events: none;
 		color: var(--text-dim);
-		font-family: var(--font-mono);
-		font-size: 0.75rem;
-		letter-spacing: 0.08em;
-		text-transform: lowercase;
-		transition: color 160ms ease, background-color 160ms ease, transform 160ms ease;
+		font-size: 0.8rem;
 	}
 
-	.typing-chip:hover,
-	.typing-chip.is-active,
-	.typing-chip--link:hover {
+	.typing-config__select {
+		width: 100%;
+		min-height: 1.95rem;
+		padding: 0.3rem 2rem 0.3rem 0.7rem;
+		border: 0;
+		border-radius: 12px;
+		background: color-mix(in srgb, var(--text) 4%, transparent);
+		color: var(--text);
+		font-family: var(--font-mono);
+		font-size: 0.68rem;
+		letter-spacing: 0.06em;
+		text-transform: lowercase;
+		appearance: none;
+		-webkit-appearance: none;
+		-moz-appearance: none;
+		color-scheme: dark;
+	}
+
+	.typing-config__select--chip {
+		min-width: 6.2rem;
+		background: color-mix(in srgb, var(--text) 3%, transparent);
+		color: var(--text-dim);
+	}
+
+	.typing-config__select--chip:focus,
+	.typing-config__select--chip:hover {
 		color: var(--accent);
 		background: color-mix(in srgb, var(--text) 5%, transparent);
 	}
 
-	.typing-chip.is-active {
-		background: color-mix(in srgb, var(--accent) 10%, transparent);
+	.typing-config__select:focus {
+		outline: none;
+		box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 24%, transparent);
 	}
 
-	.typing-stage {
-		position: relative;
-		display: grid;
-		gap: 1.4rem;
-		min-height: clamp(32rem, 72vh, 44rem);
-		padding: clamp(1.5rem, 3vw, 2rem) clamp(1rem, 4vw, 2.5rem);
+	.typing-config__select option {
+		background: #1f1f1f;
+		color: #f1ebdf;
 	}
 
-	.typing-stage__hud,
-	.typing-stage__footer,
-	.typing-result__header,
-	.typing-result__actions,
-	.typing-rail__header,
-	.typing-history li {
-		display: flex;
-		justify-content: space-between;
-		gap: 1rem;
+  .typing-chip {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 1.7rem;
+    padding: 0.28rem 0.62rem;
+    border: 0;
+    border-radius: 12px;
+    background: color-mix(in srgb, var(--text) 3%, transparent);
+    color: var(--text-dim);
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    line-height: 1;
+    letter-spacing: 0.06em;
+    text-transform: lowercase;
+    transition:
+      color 160ms ease,
+      background-color 160ms ease,
+      transform 160ms ease,
+      box-shadow 160ms ease;
+  }
+
+  .typing-chip:hover,
+  .typing-chip.is-active,
+  .typing-chip--link:hover {
+    color: var(--accent);
+    background: color-mix(in srgb, var(--text) 5%, transparent);
+  }
+
+  .typing-chip.is-active {
+    background: color-mix(in srgb, var(--accent) 10%, transparent);
+    box-shadow: inset 0 0 0 1px
+      color-mix(in srgb, var(--accent) 18%, transparent);
+  }
+
+  .typing-stage {
+    position: relative;
+    display: grid;
+    gap: 1rem;
+    min-height: clamp(32rem, 72vh, 44rem);
+    padding: clamp(1.1rem, 2.5vw, 1.6rem) clamp(0.85rem, 3vw, 2rem);
+  }
+
+  .typing-stage__hud,
+  .typing-stage__footer,
+  .typing-result__header,
+  .typing-result__actions,
+  .typing-rail__header,
+  .typing-history li {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .typing-stage__timer {
+    display: block;
+    font-family: var(--font-display);
+    font-size: clamp(3rem, 8vw, 5.5rem);
+    line-height: 0.9;
+    color: var(--accent);
+  }
+
+  .typing-stage__summary {
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 0.45rem;
+  }
+
+  .typing-inline-stat,
+  .typing-inline-link,
+  .typing-action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: row;
+    flex: 0 0 auto;
+    gap: 0.32rem;
+    padding: 0.3rem 0.62rem;
+    min-height: 1.7rem;
+    min-width: fit-content;
+    border-radius: 12px;
+    border: 0;
+    background: color-mix(in srgb, var(--text) 4%, transparent);
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    line-height: 1;
+    letter-spacing: 0.06em;
+    text-transform: lowercase;
+    white-space: nowrap;
+  }
+
+  .typing-inline-stat strong {
+    font-size: 0.82rem;
+    color: var(--accent);
+  }
+
+  .typing-action,
+  .typing-inline-link {
+    transition:
+      color 160ms ease,
+      background-color 160ms ease,
+      transform 160ms ease;
+  }
+
+  .typing-action:hover,
+  .typing-inline-link:hover {
+    color: var(--accent);
+    background: color-mix(in srgb, var(--text) 7%, transparent);
+    transform: translateY(-1px);
+  }
+
+  .typing-stage__center {
+    display: grid;
+    justify-items: center;
+    align-content: center;
+    gap: 0.7rem;
+    min-height: 15rem;
+    padding: 0.5rem 0;
+  }
+
+  .typing-stage__source {
+    margin: 0;
+    width: min(100%, 72ch);
+    font-size: 0.72rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    text-align: left;
+  }
+
+  .typing-stage__panning {
+    position: relative;
+    width: 100%;
+    transition: transform 120ms cubic-bezier(0.25, 0.8, 0.25, 1);
+  }
+
+	.typing-page[data-quote-switching='true'] .typing-stage__panning {
+		transition: none;
 	}
 
-	.typing-stage__timer {
-		display: block;
-		font-family: var(--font-display);
-		font-size: clamp(3rem, 8vw, 5.5rem);
-		line-height: 0.9;
-		color: var(--accent);
+  .typing-stage__caret {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 3px;
+    background: var(--accent);
+    border-radius: 4px;
+    transition: transform 120ms cubic-bezier(0.25, 0.8, 0.25, 1);
+    z-index: 3;
+    pointer-events: none;
+    animation: caret-blink 1.2s infinite;
+    /* Default height, overridden by JS if character height available */
+    height: clamp(1.4rem, 2.5vw, 1.8rem);
+  }
+
+	.typing-page[data-quote-switching='true'] .typing-stage__caret {
+		transition: none;
+		animation: none;
 	}
 
-	.typing-stage__summary {
+  @keyframes caret-blink {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0;
+    }
+  }
+
+  .typing-stage__quote {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    font-family: var(--font-body);
+    font-size: clamp(1.4rem, 2.5vw, 1.8rem);
+    line-height: 1.7;
+    letter-spacing: -0.02em;
+    color: color-mix(in srgb, var(--text) 32%, transparent);
+    white-space: pre-wrap;
+    text-align: left;
+    overflow-wrap: break-word;
+  }
+
+  .typing-stage__surface {
+    position: relative;
+    display: block;
+    width: min(100%, 72ch);
+    margin: 0 auto;
+    overflow: hidden;
+    cursor: text;
+    border-radius: 4px;
+  }
+
+  :global(.typing-char) {
+    border-radius: 0.2rem;
+    transition:
+      color 120ms ease,
+      background-color 120ms ease;
+    white-space: pre-wrap;
+  }
+
+  :global(.typing-char.is-pending) {
+    color: color-mix(in srgb, var(--text) 30%, transparent);
+  }
+
+  :global(.typing-char.is-correct) {
+    color: var(--text);
+  }
+
+  :global(.typing-char.is-wrong) {
+    color: var(--danger);
+    background: color-mix(in srgb, var(--danger) 16%, transparent);
+  }
+
+  :global(.typing-char.is-current) {
+    color: var(--accent-strong);
+    background: color-mix(in srgb, var(--accent) 18%, transparent);
+  }
+
+  .typing-stage__input-shell {
+    display: grid;
+    gap: 0.35rem;
+  }
+
+  .typing-stage__input-hint {
+    font-size: 0.68rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+  }
+
+  .typing-stage__overlay-input {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: transparent;
+    caret-color: transparent;
+    overflow: hidden;
+    font-family: var(--font-body);
+    font-size: clamp(1.4rem, 2.5vw, 1.8rem);
+    line-height: 1.7;
+    letter-spacing: -0.02em;
+    resize: none;
+    overflow: hidden;
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
+    text-align: left;
+    scrollbar-width: none;
+  }
+
+  .typing-stage__overlay-input::-webkit-scrollbar {
+    display: none;
+  }
+
+  .typing-stage__overlay-input:focus {
+    outline: none;
+  }
+
+  .typing-stage__stats {
+    display: flex;
+    gap: 0.75rem;
+  }
+
+  .typing-stage__stat,
+  .typing-result__hero-block,
+  .typing-result__summary-item {
+    display: grid;
+    gap: 0.25rem;
+  }
+
+  .typing-stage__stat span,
+  .typing-result__hero-block span,
+  .typing-result__summary-item span,
+  .typing-result__chart-core span {
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+  }
+
+  .typing-stage__stat strong {
+    font-family: var(--font-display);
+    font-size: clamp(1.7rem, 4vw, 2.4rem);
+    color: var(--text);
+  }
+
+  .typing-stage__actions,
+  .typing-result__actions {
+    align-items: center;
+    gap: 0.45rem;
+  }
+
+  .typing-result {
+    position: relative;
+    z-index: 1;
+    width: min(94vw, 72rem);
+    padding: 1.5rem 1.6rem;
+    border-radius: 28px;
+    background: linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--text) 4%, transparent),
+      color-mix(in srgb, var(--text) 1%, transparent)
+    );
+  }
+
+  .typing-result-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 30;
+    display: grid;
+    place-items: center;
+    padding: 1.25rem;
+  }
+
+	.typing-result-modal[hidden] {
+		display: none !important;
+	}
+
+  .typing-result-modal__backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.62);
+    backdrop-filter: blur(6px);
+  }
+
+  .typing-result h2,
+  .typing-rail__card h3 {
+    margin: 0.35rem 0 0;
+    font-family: var(--font-display);
+  }
+
+  .typing-result__header p:last-child,
+  .typing-rail__copy,
+  .typing-rail__card p[data-home-user-email] {
+    margin: 0;
+    color: var(--text-muted);
+  }
+
+  .typing-result__body {
+    display: grid;
+    grid-template-columns: minmax(0, 12rem) minmax(0, 1fr);
+    gap: 1.85rem;
+    align-items: stretch;
+    margin: 1.2rem 0 1rem;
+  }
+
+  .typing-result__hero-metrics {
+    display: grid;
+    align-content: start;
+    gap: 1rem;
+  }
+
+  .typing-result__hero-block {
+    padding: 0.9rem 1rem;
+    border-radius: 20px;
+    background: color-mix(in srgb, var(--text) 4%, transparent);
+  }
+
+  .typing-result__hero-block strong {
+    font-family: var(--font-display);
+    font-size: clamp(2.6rem, 6vw, 4.6rem);
+    line-height: 0.95;
+    color: var(--accent);
+  }
+
+  .typing-result__graph-shell {
+    display: grid;
+    gap: 0.7rem;
+    min-height: 20rem;
+    min-width: 0;
+  }
+
+  .typing-result__graph-head {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    align-items: center;
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    letter-spacing: 0.08em;
+    text-transform: lowercase;
+  }
+
+  .typing-result__graph-head strong {
+    color: var(--accent);
+    font-size: 1rem;
+  }
+
+	.typing-result__legend {
 		display: flex;
 		flex-wrap: wrap;
 		justify-content: flex-end;
-		gap: 0.65rem;
-	}
-
-	.typing-inline-stat,
-	.typing-inline-link,
-	.typing-action {
-		display: inline-flex;
-		align-items: center;
-		justify-content: center;
-		gap: 0.4rem;
-		padding: 0.55rem 0.8rem;
-		border-radius: 999px;
-		border: 0;
-		background: color-mix(in srgb, var(--text) 4%, transparent);
+		gap: 1rem;
 		color: var(--text-muted);
 		font-family: var(--font-mono);
-		font-size: 0.75rem;
-		letter-spacing: 0.08em;
+		font-size: 0.78rem;
+		letter-spacing: 0.04em;
 		text-transform: lowercase;
 	}
 
-	.typing-inline-stat strong {
-		font-size: 0.95rem;
-		color: var(--accent);
-	}
-
-	.typing-action,
-	.typing-inline-link {
-		transition: color 160ms ease, background-color 160ms ease, transform 160ms ease;
-	}
-
-	.typing-action:hover,
-	.typing-inline-link:hover {
-		color: var(--accent);
-		background: color-mix(in srgb, var(--text) 7%, transparent);
-		transform: translateY(-1px);
-	}
-
-	.typing-stage__center {
-		display: grid;
-		justify-items: center;
-		align-content: center;
-		gap: 1rem;
-		min-height: 15rem;
-		padding: 1rem 0;
-	}
-
-	.typing-stage__source {
-		margin: 0;
-		width: min(100%, 72ch);
-		font-size: 0.72rem;
-		letter-spacing: 0.14em;
-		text-transform: uppercase;
-		color: var(--text-dim);
-		text-align: left;
-	}
-
-	.typing-stage__panning {
-		position: relative;
-		width: 100%;
-		transition: transform 120ms cubic-bezier(0.25, 0.8, 0.25, 1);
-	}
-
-	.typing-stage__caret {
-		position: absolute;
-		top: 0;
-		left: 0;
-		width: 3px;
-		background: var(--accent);
-		border-radius: 4px;
-		transition: transform 120ms cubic-bezier(0.25, 0.8, 0.25, 1);
-		z-index: 3;
-		pointer-events: none;
-		animation: caret-blink 1.2s infinite;
-		/* Default height, overridden by JS if character height available */
-		height: clamp(1.4rem, 2.5vw, 1.8rem);
-	}
-
-	@keyframes caret-blink {
-		0%, 100% { opacity: 1; }
-		50% { opacity: 0; }
-	}
-
-	.typing-stage__quote {
-		position: relative;
-		z-index: 1;
-		width: 100%;
-		font-family: var(--font-body);
-		font-size: clamp(1.4rem, 2.5vw, 1.8rem);
-		line-height: 1.7;
-		letter-spacing: -0.02em;
-		color: color-mix(in srgb, var(--text) 32%, transparent);
-		white-space: pre-wrap;
-		text-align: left;
-		overflow-wrap: break-word;
-	}
-
-	.typing-stage__surface {
-		position: relative;
-		display: block;
-		width: min(100%, 72ch);
-		margin: 0 auto;
-		overflow: hidden;
-		cursor: text;
-		border-radius: 4px;
-	}
-
-	:global(.typing-char) {
-		border-radius: 0.2rem;
-		transition: color 120ms ease, background-color 120ms ease;
-		white-space: pre-wrap;
-	}
-
-	:global(.typing-char.is-pending) {
-		color: color-mix(in srgb, var(--text) 30%, transparent);
-	}
-
-	:global(.typing-char.is-correct) {
-		color: var(--text);
-	}
-
-	:global(.typing-char.is-wrong) {
-		color: var(--danger);
-		background: color-mix(in srgb, var(--danger) 16%, transparent);
-	}
-
-	:global(.typing-char.is-current) {
-		color: var(--accent-strong);
-		background: color-mix(in srgb, var(--accent) 18%, transparent);
-	}
-
-	.typing-stage__input-shell {
-		display: grid;
-		gap: 0.6rem;
-	}
-
-	.typing-stage__input-hint {
-		font-size: 0.68rem;
-		letter-spacing: 0.14em;
-		text-transform: uppercase;
-		color: var(--text-dim);
-	}
-
-	.typing-stage__overlay-input {
-		position: absolute;
-		inset: 0;
-		z-index: 2;
-		width: 100%;
-		height: 100%;
-		padding: 0;
-		border: 0;
-		background: transparent;
-		color: transparent;
-		caret-color: transparent;
-		overflow: hidden;
-		font-family: var(--font-body);
-		font-size: clamp(1.4rem, 2.5vw, 1.8rem);
-		line-height: 1.7;
-		letter-spacing: -0.02em;
-		resize: none;
-		overflow: hidden;
-		white-space: pre-wrap;
-		overflow-wrap: break-word;
-		text-align: left;
-		scrollbar-width: none;
-	}
-
-	.typing-stage__overlay-input::-webkit-scrollbar {
-		display: none;
-	}
-
-	.typing-stage__overlay-input:focus {
-		outline: none;
-	}
-
-	.typing-stage__stats {
-		display: flex;
-		gap: 1rem;
-	}
-
-	.typing-stage__stat,
-	.typing-result__metrics article {
-		display: grid;
-		gap: 0.25rem;
-	}
-
-	.typing-stage__stat span,
-	.typing-result__metrics span {
-		font-family: var(--font-mono);
-		font-size: 0.68rem;
-		letter-spacing: 0.16em;
-		text-transform: uppercase;
-		color: var(--text-dim);
-	}
-
-	.typing-stage__stat strong {
-		font-family: var(--font-display);
-		font-size: clamp(1.7rem, 4vw, 2.4rem);
-		color: var(--text);
-	}
-
-	.typing-stage__actions,
-	.typing-result__actions {
+	.typing-result__legend span {
+		display: inline-flex;
 		align-items: center;
+		gap: 0.35rem;
 	}
 
-	.typing-result {
-		padding: 1.2rem 1.3rem;
-		border-radius: 24px;
-		background: linear-gradient(180deg, color-mix(in srgb, var(--text) 4%, transparent), color-mix(in srgb, var(--text) 1%, transparent));
-	}
-
-	.typing-result h2,
-	.typing-rail__card h3 {
-		margin: 0.35rem 0 0;
-		font-family: var(--font-display);
-	}
-
-	.typing-result__header p:last-child,
-	.typing-rail__copy,
-	.typing-rail__card p[data-home-user-email] {
-		margin: 0;
-		color: var(--text-muted);
-	}
-
-	.typing-result__metrics {
-		display: grid;
-		grid-template-columns: repeat(4, minmax(0, 1fr));
-		gap: 1rem;
-		margin: 1rem 0 1.2rem;
-	}
-
-	.typing-result__metrics strong {
-		font-family: var(--font-display);
-		font-size: clamp(2rem, 5vw, 3.2rem);
-		line-height: 1;
-		color: var(--accent);
-	}
-
-	.typing-rail {
-		display: grid;
-		grid-template-columns: repeat(2, minmax(0, 1fr));
-		gap: 1rem;
-	}
-
-	.typing-rail__card {
-		padding: 1.1rem 1.2rem;
-		border-radius: 22px;
-	}
-
-	.typing-rail__header.is-compact {
-		align-items: center;
-	}
-
-	.typing-history {
-		display: grid;
-		gap: 0.75rem;
-		margin: 1rem 0 0;
-		padding: 0;
-		list-style: none;
-	}
-
-	.typing-history li {
-		padding: 0.9rem 0.95rem;
-		border-radius: 18px;
-		background: color-mix(in srgb, var(--text) 4%, transparent);
-	}
-
-	.typing-history li strong {
-		font-size: 0.92rem;
-	}
-
-	.typing-history li span,
-	:global(.typing-history__empty) {
-		color: var(--text-muted);
-		font-size: 0.84rem;
-	}
-
-	.typing-shortcuts {
-		display: flex;
-		flex-wrap: wrap;
-		justify-content: center;
-		gap: 1rem;
-		color: var(--text-dim);
-		font-family: var(--font-mono);
-		font-size: 0.74rem;
-		letter-spacing: 0.06em;
-	}
-
-	.typing-shortcuts kbd {
-		padding: 0.28rem 0.5rem;
+	.typing-result__legend i {
+		display: inline-block;
+		width: 0.95rem;
+		height: 0.2rem;
 		border-radius: 999px;
-		background: color-mix(in srgb, var(--text) 5%, transparent);
-		color: var(--accent);
-		font: inherit;
 	}
 
-	@media (max-width: 960px) {
-		.typing-config,
-		.typing-rail,
-		.typing-result__metrics {
+	.typing-result__legend .is-wpm {
+		background: var(--accent);
+	}
+
+	.typing-result__legend .is-raw {
+		background: rgba(255, 255, 255, 0.95);
+	}
+
+	.typing-result__legend .is-burst {
+		background: rgba(116, 208, 241, 0.96);
+	}
+
+	.typing-result__legend .is-errors {
+		background: color-mix(in srgb, #ff6b7f 90%, transparent);
+	}
+
+  .typing-result__graph {
+    position: relative;
+    width: 100%;
+    height: 20rem;
+    border-radius: 20px;
+    padding: 0.7rem 0.8rem 0.45rem;
+    background:
+      linear-gradient(180deg, color-mix(in srgb, var(--text) 2%, transparent), color-mix(in srgb, var(--text) 1%, transparent));
+    overflow: hidden;
+  }
+
+  .typing-result__graph canvas {
+    width: 100% !important;
+    height: 100% !important;
+    display: block;
+  }
+
+  .typing-result__summary-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0.9rem;
+    margin-bottom: 1.2rem;
+    align-items: stretch;
+  }
+
+  .typing-result__summary-item {
+    padding: 0.85rem 0.95rem;
+    border-radius: 18px;
+    background: color-mix(in srgb, var(--text) 4%, transparent);
+  }
+
+  .typing-result__summary-item strong,
+  .typing-result__chart-core strong {
+    font-family: var(--font-display);
+    font-size: clamp(1.6rem, 4vw, 2.6rem);
+    line-height: 1;
+    color: var(--accent);
+  }
+
+  .typing-rail {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+  }
+
+  .typing-rail__card {
+    padding: 0.95rem 1rem;
+    border-radius: 18px;
+  }
+
+  .typing-rail__header.is-compact {
+    align-items: center;
+  }
+
+  .typing-history {
+    display: grid;
+    gap: 0.75rem;
+    margin: 1rem 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .typing-history li {
+    padding: 0.75rem 0.8rem;
+    border-radius: 14px;
+    background: color-mix(in srgb, var(--text) 4%, transparent);
+  }
+
+  .typing-history li strong {
+    font-size: 0.92rem;
+  }
+
+  .typing-history li span,
+  :global(.typing-history__empty) {
+    color: var(--text-muted);
+    font-size: 0.84rem;
+  }
+
+  .typing-shortcuts {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1rem;
+    color: var(--text-dim);
+    font-family: var(--font-mono);
+    font-size: 0.74rem;
+    letter-spacing: 0.06em;
+  }
+
+  .typing-shortcuts kbd {
+    padding: 0.28rem 0.5rem;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--text) 5%, transparent);
+    color: var(--accent);
+    font: inherit;
+  }
+
+  @media (max-width: 960px) {
+    .typing-config,
+    .typing-rail {
+      grid-template-columns: 1fr;
+    }
+
+		.typing-result__body,
+		.typing-result__summary-grid {
 			grid-template-columns: 1fr;
 		}
 
-		.typing-config__group.is-utility {
-			justify-self: stretch;
-		}
-	}
-
-	@media (max-width: 720px) {
-		.typing-stage {
-			min-height: auto;
+		.typing-result__hero-metrics {
+			grid-template-columns: repeat(2, minmax(0, 1fr));
 		}
 
-		.typing-stage__hud,
-		.typing-stage__footer,
-		.typing-result__header,
-		.typing-result__actions,
-		.typing-rail__header,
-		.typing-history li {
-			flex-direction: column;
+    .typing-config__group.is-utility {
+      justify-self: stretch;
+    }
+  }
+
+  @media (max-width: 720px) {
+    .typing-stage {
+      min-height: auto;
+    }
+
+    .typing-stage__hud,
+    .typing-stage__footer,
+    .typing-result__header,
+    .typing-result__actions,
+    .typing-rail__header,
+    .typing-history li {
+      flex-direction: column;
+    }
+
+    .typing-stage__hud {
+      align-items: flex-start;
+    }
+
+    .typing-stage__summary {
+      flex-direction: row;
+      flex-wrap: wrap;
+      justify-content: flex-start;
+      align-items: center;
+    }
+
+    .typing-stage__stats,
+    .typing-stage__actions {
+      flex-wrap: wrap;
+    }
+
+		.typing-result {
+			padding: 1.15rem 1rem;
 		}
 
-		.typing-stage__summary {
-			justify-content: flex-start;
+		.typing-result__hero-metrics {
+			grid-template-columns: 1fr;
 		}
 
-		.typing-stage__stats,
-		.typing-stage__actions {
-			flex-wrap: wrap;
+		.typing-result__graph {
+			height: 15rem;
 		}
-	}
+
+		.typing-result__summary-grid {
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+		}
+    }
 </style>

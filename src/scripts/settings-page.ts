@@ -22,6 +22,7 @@ function serializePreferences(form: HTMLFormElement): UserPreferences {
 		theme: String(formData.get('theme') || DEFAULT_PREFERENCES.theme) as UserPreferences['theme'],
 		language: String(formData.get('language') || DEFAULT_PREFERENCES.language),
 		defaultMode: String(formData.get('defaultMode') || DEFAULT_PREFERENCES.defaultMode) as UserPreferences['defaultMode'],
+		timeDuration: Number(formData.get('timeDuration') || DEFAULT_PREFERENCES.timeDuration) as UserPreferences['timeDuration'],
 		showLiveWpm: formData.get('showLiveWpm') === 'on',
 		soundEnabled: formData.get('soundEnabled') === 'on'
 	};
@@ -58,7 +59,14 @@ function getDirtyPayload(initial: UserPreferences, current: UserPreferences) {
 }
 
 function describePreferences(target: HTMLElement, preferences: UserPreferences) {
-	target.textContent = `Theme ${preferences.theme} • ${preferences.language} • ${preferences.defaultMode} • live WPM ${preferences.showLiveWpm ? 'on' : 'off'} • sound ${preferences.soundEnabled ? 'on' : 'off'}`;
+	const modeSummary =
+		preferences.defaultMode === 'time'
+			? `${preferences.defaultMode} ${preferences.timeDuration}s`
+			: preferences.defaultMode === 'words'
+				? 'words 50/100/150 on home'
+				: preferences.defaultMode;
+
+	target.textContent = `Theme ${preferences.theme} • ${preferences.language} • ${modeSummary} • live WPM ${preferences.showLiveWpm ? 'on' : 'off'} • sound ${preferences.soundEnabled ? 'on' : 'off'}`;
 }
 
 export function initSettingsPage() {

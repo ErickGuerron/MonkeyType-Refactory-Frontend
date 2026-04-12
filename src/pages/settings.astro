@@ -2,16 +2,22 @@
 import PrivateLayout from '../layouts/PrivateLayout.astro';
 
 const modeOptions = [
-	{ value: 'time', label: 'Time (30 segundos)' },
+	{ value: 'time', label: 'Time (duración configurable)' },
 	{ value: 'quote', label: 'Quote completa' },
-	{ value: 'words', label: 'Words' },
-	{ value: 'zen', label: 'Zen' },
+	{ value: 'words', label: 'Words (50 / 100 / 150 en home)' },
+	{ value: 'zen', label: 'Zen (escritura libre)' },
 	{ value: 'custom', label: 'Custom' }
 ];
 
 const languageOptions = [
 	{ value: 'english', label: 'English' },
 	{ value: 'spanish', label: 'Español' }
+];
+
+const timeOptions = [
+	{ value: 30, label: '30 segundos' },
+	{ value: 60, label: '60 segundos' },
+	{ value: 120, label: '120 segundos' }
 ];
 
 const themeOptions = [
@@ -27,7 +33,7 @@ const themeOptions = [
 	activeHref="/settings"
 	pageEyebrow="Settings"
 	pageTitle="Ajustá la experiencia hasta que se sienta tuya."
-	pageDescription="La estructura visual sigue siendo profunda y ordenada, pero ahora theme, language, defaultMode, live WPM y sound se leen y persisten contra la API real."
+	pageDescription="La estructura visual sigue siendo profunda y ordenada, pero ahora theme, language, defaultMode, timeDuration, live WPM y sound se leen y persisten contra la API real."
 >
 	<section class="settings-page" data-settings-page>
 		<article class="terminal-panel settings-profile">
@@ -75,6 +81,14 @@ const themeOptions = [
 							))}
 						</select>
 					</label>
+					<label class="settings-field">
+						<span>Time duration</span>
+						<select name="timeDuration">
+							{timeOptions.map((option) => (
+								<option value={option.value}>{option.label}</option>
+							))}
+						</select>
+					</label>
 				</div>
 			</article>
 
@@ -107,10 +121,11 @@ const themeOptions = [
 					<h3>Preview</h3>
 					<span>Now</span>
 				</div>
-				<p data-settings-summary>Theme system • english • time • live WPM on • sound off</p>
+				<p data-settings-summary>Theme system • english • time 30s • live WPM on • sound off</p>
 				<ul class="settings-bullets">
-					<li><span>La home usa language + defaultMode para elegir quote y duración base.</span></li>
+					<li><span>La home usa language + defaultMode + timeDuration para elegir quote, duración base o armar words 50/100/150.</span></li>
 					<li><span>Theme se aplica en caliente sobre el layout actual.</span></li>
+					<li><span>Zen guarda stats/resultados, pero no persiste el texto libre como quote en Mongo.</span></li>
 					<li><span>Los cambios se guardan con PATCH real a <code>/api/users/me/preferences</code>.</span></li>
 				</ul>
 			</article>
@@ -234,6 +249,21 @@ const themeOptions = [
 		border-radius: var(--radius-sm);
 		background: rgba(255, 255, 255, 0.03);
 		color: var(--text);
+		appearance: none;
+		-webkit-appearance: none;
+		-moz-appearance: none;
+		color-scheme: dark;
+	}
+
+	.settings-field select:focus {
+		outline: none;
+		border-color: color-mix(in srgb, var(--accent) 28%, transparent);
+		box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 10%, transparent);
+	}
+
+	.settings-field select option {
+		background: #1f1f1f;
+		color: #f1ebdf;
 	}
 
 	.settings-toggle {

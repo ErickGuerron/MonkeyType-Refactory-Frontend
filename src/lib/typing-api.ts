@@ -4,6 +4,7 @@ export interface UserPreferences {
 	theme: 'system' | 'dark' | 'light';
 	language: string;
 	defaultMode: 'time' | 'words' | 'quote' | 'zen' | 'custom';
+	timeDuration: 30 | 60 | 120;
 	showLiveWpm: boolean;
 	soundEnabled: boolean;
 }
@@ -55,6 +56,7 @@ export const DEFAULT_PREFERENCES: UserPreferences = {
 	theme: 'system',
 	language: 'english',
 	defaultMode: 'time',
+	timeDuration: 30,
 	showLiveWpm: true,
 	soundEnabled: false
 };
