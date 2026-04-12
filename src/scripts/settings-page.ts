@@ -3,6 +3,7 @@ import { showErrorAlert, showToast } from '../lib/alerts';
 import {
 	DEFAULT_PREFERENCES,
 	getMyPreferences,
+	readCachedPreferences,
 	updateMyPreferences,
 	type UserPreferences
 } from '../lib/typing-api';
@@ -24,6 +25,8 @@ function serializePreferences(form: HTMLFormElement): UserPreferences {
 		defaultMode: String(formData.get('defaultMode') || DEFAULT_PREFERENCES.defaultMode) as UserPreferences['defaultMode'],
 		timeDuration: Number(formData.get('timeDuration') || DEFAULT_PREFERENCES.timeDuration) as UserPreferences['timeDuration'],
 		showLiveWpm: formData.get('showLiveWpm') === 'on',
+		punctuationEnabled: formData.get('punctuationEnabled') === 'on',
+		numbersEnabled: formData.get('numbersEnabled') === 'on',
 		soundEnabled: formData.get('soundEnabled') === 'on'
 	};
 }
@@ -66,7 +69,7 @@ function describePreferences(target: HTMLElement, preferences: UserPreferences) 
 				? 'words 50/100/150 on home'
 				: preferences.defaultMode;
 
-	target.textContent = `Theme ${preferences.theme} • ${preferences.language} • ${modeSummary} • live WPM ${preferences.showLiveWpm ? 'on' : 'off'} • sound ${preferences.soundEnabled ? 'on' : 'off'}`;
+	target.textContent = `Theme ${preferences.theme} • ${preferences.language} • ${modeSummary} • live WPM ${preferences.showLiveWpm ? 'on' : 'off'} • punctuation ${preferences.punctuationEnabled ? 'on' : 'off'} • numbers ${preferences.numbersEnabled ? 'on' : 'off'} • sound ${preferences.soundEnabled ? 'on' : 'off'}`;
 }
 
 export function initSettingsPage() {
@@ -96,6 +99,15 @@ export function initSettingsPage() {
 	}
 
 	let initialPreferences = { ...DEFAULT_PREFERENCES };
+	const cachedPreferences = readCachedPreferences();
+	let loadingStatusTimer = 0 as number | undefined;
+
+	const clearLoadingTimer = () => {
+		if (loadingStatusTimer !== undefined) {
+			window.clearTimeout(loadingStatusTimer);
+			loadingStatusTimer = undefined;
+		}
+	};
 
 	const syncDirtyState = () => {
 		const currentPreferences = serializePreferences(form);
@@ -107,6 +119,14 @@ export function initSettingsPage() {
 	logoutButtons.forEach((button) => bindLogout(button));
 	if (userName) userName.textContent = session.user.name;
 	if (userEmail) userEmail.textContent = session.user.email;
+
+	if (cachedPreferences) {
+		initialPreferences = cachedPreferences;
+		applyPreferencesToForm(form, cachedPreferences);
+		applyThemePreference(cachedPreferences.theme);
+		clearStatus(status);
+		syncDirtyState();
+	}
 
 	void syncCurrentUser(session, (user) => {
 		if (userName) userName.textContent = user.name;
@@ -170,9 +190,12 @@ export function initSettingsPage() {
 		}
 	});
 
-	setStatus(status, 'Cargando preferencias...', 'info');
+	loadingStatusTimer = window.setTimeout(() => {
+		setStatus(status, 'Cargando preferencias...', 'info');
+	}, 180);
 	void getMyPreferences(session)
 		.then((preferences) => {
+			clearLoadingTimer();
 			initialPreferences = preferences;
 			applyPreferencesToForm(form, preferences);
 			applyThemePreference(preferences.theme);
@@ -180,6 +203,7 @@ export function initSettingsPage() {
 			syncDirtyState();
 		})
 		.catch(async (error) => {
+			clearLoadingTimer();
 			if (error instanceof ApiError && error.status === 401) {
 				handleAuthFailure();
 				return;

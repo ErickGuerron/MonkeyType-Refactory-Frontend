@@ -24,6 +24,29 @@ const {
 		<meta name="generator" content={Astro.generator} />
 		<meta name="description" content={description} />
 		<title>{title}</title>
+		<script is:inline>
+			(() => {
+				const storageKey = 'monkeytype.theme-preference';
+				const root = document.documentElement;
+				const resolveSystemTheme = () =>
+					window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+
+				try {
+					const storedPreference = window.localStorage.getItem(storageKey);
+					const preference =
+						storedPreference === 'light' || storedPreference === 'dark' || storedPreference === 'system'
+							? storedPreference
+							: 'system';
+					const resolvedTheme = preference === 'system' ? resolveSystemTheme() : preference;
+
+					root.dataset.themePreference = preference;
+					root.dataset.userTheme = resolvedTheme;
+				} catch {
+					root.dataset.themePreference = 'system';
+					root.dataset.userTheme = resolveSystemTheme();
+				}
+			})();
+		</script>
 	</head>
 	<body class={bodyClass}>
 		<slot />

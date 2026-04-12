@@ -58,6 +58,18 @@
         >
         <button
           class="typing-chip"
+          data-pref-key="punctuationEnabled"
+          data-pref-toggle="true"
+          type="button">punctuation</button
+        >
+        <button
+          class="typing-chip"
+          data-pref-key="numbersEnabled"
+          data-pref-toggle="true"
+          type="button">numbers</button
+        >
+        <button
+          class="typing-chip"
           data-pref-key="soundEnabled"
           data-pref-toggle="true"
           type="button">sound</button
@@ -326,7 +338,7 @@
 		padding: 0.3rem 2rem 0.3rem 0.7rem;
 		border: 0;
 		border-radius: 12px;
-		background: color-mix(in srgb, var(--text) 4%, transparent);
+		background: var(--surface-elevated);
 		color: var(--text);
 		font-family: var(--font-mono);
 		font-size: 0.68rem;
@@ -335,7 +347,7 @@
 		appearance: none;
 		-webkit-appearance: none;
 		-moz-appearance: none;
-		color-scheme: dark;
+		color-scheme: inherit;
 	}
 
 	.typing-config__select--chip {
@@ -356,8 +368,8 @@
 	}
 
 	.typing-config__select option {
-		background: #1f1f1f;
-		color: #f1ebdf;
+		background: var(--surface-elevated);
+		color: var(--text);
 	}
 
   .typing-chip {
@@ -381,6 +393,11 @@
       transform 160ms ease,
       box-shadow 160ms ease;
   }
+
+	.typing-chip[hidden],
+	.typing-action[hidden] {
+		display: none !important;
+	}
 
   .typing-chip:hover,
   .typing-chip.is-active,
@@ -671,6 +688,7 @@
       color-mix(in srgb, var(--text) 4%, transparent),
       color-mix(in srgb, var(--text) 1%, transparent)
     );
+    box-sizing: border-box;
   }
 
   .typing-result-modal {
@@ -708,36 +726,44 @@
 
   .typing-result__body {
     display: grid;
-    grid-template-columns: minmax(0, 12rem) minmax(0, 1fr);
-    gap: 1.85rem;
+		grid-template-columns: minmax(13.5rem, max-content) minmax(0, 1fr);
+    gap: 2.5rem;
     align-items: stretch;
-    margin: 1.2rem 0 1rem;
+    margin: 1.5rem 0 1.2rem;
   }
 
   .typing-result__hero-metrics {
-    display: grid;
-    align-content: start;
-    gap: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+		position: relative;
+		z-index: 2;
+		min-width: 0;
   }
 
   .typing-result__hero-block {
-    padding: 0.9rem 1rem;
+    padding: 1.2rem 1.4rem;
     border-radius: 20px;
     background: color-mix(in srgb, var(--text) 4%, transparent);
+    box-sizing: border-box;
+    flex: 1;
   }
 
   .typing-result__hero-block strong {
     font-family: var(--font-display);
-    font-size: clamp(2.6rem, 6vw, 4.6rem);
+    font-size: clamp(2.8rem, 6vw, 4.6rem);
     line-height: 0.95;
     color: var(--accent);
   }
 
   .typing-result__graph-shell {
-    display: grid;
-    gap: 0.7rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
     min-height: 20rem;
     min-width: 0;
+		position: relative;
+		z-index: 1;
   }
 
   .typing-result__graph-head {
@@ -747,7 +773,7 @@
     align-items: center;
     color: var(--text-muted);
     font-family: var(--font-mono);
-    font-size: 0.82rem;
+    font-size: 0.85rem;
     letter-spacing: 0.08em;
     text-transform: lowercase;
   }
@@ -807,6 +833,7 @@
     background:
       linear-gradient(180deg, color-mix(in srgb, var(--text) 2%, transparent), color-mix(in srgb, var(--text) 1%, transparent));
     overflow: hidden;
+    box-sizing: border-box;
   }
 
   .typing-result__graph canvas {
@@ -814,6 +841,37 @@
     height: 100% !important;
     display: block;
   }
+
+	:global(:root[data-user-theme='light']) .typing-result-modal__backdrop {
+		background: rgba(80, 60, 20, 0.16);
+		backdrop-filter: blur(10px);
+	}
+
+	:global(:root[data-user-theme='light']) .typing-result {
+		border: 1px solid color-mix(in srgb, var(--accent) 16%, var(--border));
+		background:
+			linear-gradient(180deg, rgba(255, 255, 255, 0.58), rgba(255, 255, 255, 0.16) 26%),
+			var(--surface-strong);
+		box-shadow: 0 24px 80px rgba(94, 71, 21, 0.18);
+	}
+
+	:global(:root[data-user-theme='light']) .typing-result__hero-block,
+	:global(:root[data-user-theme='light']) .typing-result__summary-item,
+	:global(:root[data-user-theme='light']) .typing-history li {
+		background: color-mix(in srgb, var(--bg-soft) 82%, white 18%);
+		border: 1px solid color-mix(in srgb, var(--accent) 10%, var(--border));
+	}
+
+	:global(:root[data-user-theme='light']) .typing-result__graph {
+		background:
+			linear-gradient(180deg, rgba(255, 255, 255, 0.42), rgba(255, 255, 255, 0.08) 24%),
+			color-mix(in srgb, var(--bg-soft) 86%, white 14%);
+		border: 1px solid color-mix(in srgb, var(--accent) 10%, var(--border));
+	}
+
+	:global(:root[data-user-theme='light']) .typing-result__legend .is-raw {
+		background: rgba(36, 27, 13, 0.72);
+	}
 
   .typing-result__summary-grid {
     display: grid;
@@ -907,7 +965,7 @@
 		}
 
 		.typing-result__hero-metrics {
-			grid-template-columns: repeat(2, minmax(0, 1fr));
+			flex-direction: row;
 		}
 
     .typing-config__group.is-utility {
@@ -950,7 +1008,7 @@
 		}
 
 		.typing-result__hero-metrics {
-			grid-template-columns: 1fr;
+			flex-direction: column;
 		}
 
 		.typing-result__graph {

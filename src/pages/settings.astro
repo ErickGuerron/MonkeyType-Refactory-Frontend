@@ -33,7 +33,7 @@ const themeOptions = [
 	activeHref="/settings"
 	pageEyebrow="Settings"
 	pageTitle="Ajustá la experiencia hasta que se sienta tuya."
-	pageDescription="La estructura visual sigue siendo profunda y ordenada, pero ahora theme, language, defaultMode, timeDuration, live WPM y sound se leen y persisten contra la API real."
+	pageDescription="La estructura visual sigue siendo profunda y ordenada, pero ahora theme, language, defaultMode, timeDuration, live WPM, punctuation, numbers y sound se leen y persisten contra la API real."
 >
 	<section class="settings-page" data-settings-page>
 		<article class="terminal-panel settings-profile">
@@ -47,7 +47,7 @@ const themeOptions = [
 			</div>
 		</article>
 
-		<div class="status-box is-visible" data-settings-status data-tone="info">Cargando preferencias...</div>
+		<div class="status-box" data-settings-status data-tone="info"></div>
 
 		<form class="settings-grid" data-preferences-form>
 			<article class="terminal-panel settings-card settings-card--form">
@@ -108,6 +108,20 @@ const themeOptions = [
 					</label>
 					<label class="settings-toggle">
 						<div>
+							<strong>Punctuation enabled</strong>
+							<p>En words/time conserva signos; en quote se mantiene siempre el texto natural.</p>
+						</div>
+						<input name="punctuationEnabled" type="checkbox" />
+					</label>
+					<label class="settings-toggle">
+						<div>
+							<strong>Numbers enabled</strong>
+							<p>En words/time conserva números; apagado deriva el texto desde la quote original sin dígitos.</p>
+						</div>
+						<input name="numbersEnabled" type="checkbox" />
+					</label>
+					<label class="settings-toggle">
+						<div>
 							<strong>Sound enabled</strong>
 							<p>Activa tonos sutiles para errores y finalización del test.</p>
 						</div>
@@ -121,9 +135,10 @@ const themeOptions = [
 					<h3>Preview</h3>
 					<span>Now</span>
 				</div>
-				<p data-settings-summary>Theme system • english • time 30s • live WPM on • sound off</p>
+				<p data-settings-summary>Theme system • english • time 30s • live WPM on • punctuation off • numbers off • sound off</p>
 				<ul class="settings-bullets">
 					<li><span>La home usa language + defaultMode + timeDuration para elegir quote, duración base o armar words 50/100/150.</span></li>
+					<li><span>Words y time derivan el texto desde la quote original aplicando filtros de punctuation y numbers.</span></li>
 					<li><span>Theme se aplica en caliente sobre el layout actual.</span></li>
 					<li><span>Zen guarda stats/resultados, pero no persiste el texto libre como quote en Mongo.</span></li>
 					<li><span>Los cambios se guardan con PATCH real a <code>/api/users/me/preferences</code>.</span></li>
@@ -247,12 +262,12 @@ const themeOptions = [
 		padding: 0.8rem 0.95rem;
 		border: 1px solid rgba(255, 255, 255, 0.08);
 		border-radius: var(--radius-sm);
-		background: rgba(255, 255, 255, 0.03);
+		background: var(--surface-elevated);
 		color: var(--text);
 		appearance: none;
 		-webkit-appearance: none;
 		-moz-appearance: none;
-		color-scheme: dark;
+		color-scheme: inherit;
 	}
 
 	.settings-field select:focus {
@@ -262,8 +277,8 @@ const themeOptions = [
 	}
 
 	.settings-field select option {
-		background: #1f1f1f;
-		color: #f1ebdf;
+		background: var(--surface-elevated);
+		color: var(--text);
 	}
 
 	.settings-toggle {

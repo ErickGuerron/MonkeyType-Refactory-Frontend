@@ -24,6 +24,7 @@
 	--font-display: 'Space Grotesk', system-ui, sans-serif;
 	--font-body: 'Lexend', system-ui, sans-serif;
 	--font-mono: 'Roboto Mono', 'SFMono-Regular', monospace;
+	color-scheme: dark;
 }
 
 :root[data-user-theme='light'] {
@@ -42,6 +43,7 @@
 	--danger: #b75643;
 	--success: #2b6f3a;
 	--shadow: 0 24px 80px rgba(94, 71, 21, 0.12);
+	color-scheme: light;
 }
 
 * {
@@ -323,22 +325,31 @@ button {
 .swal2-toast.monkey-swal {
 	padding: 0.8rem 1rem;
 	border-radius: 18px;
-	background: rgba(19, 19, 19, 0.94) !important;
+	border: 1px solid var(--border-strong);
+	background:
+		linear-gradient(180deg, rgba(255, 255, 255, 0.03), transparent 32%),
+		var(--surface-elevated) !important;
+	color: var(--text) !important;
 	box-shadow: 0 18px 48px rgba(0, 0, 0, 0.38);
 }
 
-.swal2-toast .swal2-title {
+.swal2-toast.monkey-swal .swal2-title {
 	font-family: var(--font-mono);
 	font-size: 0.8rem;
 	letter-spacing: 0.08em;
 	text-transform: uppercase;
+	color: var(--text) !important;
 }
 
-.swal2-toast .swal2-html-container,
-.swal2-toast .swal2-content {
+.swal2-toast.monkey-swal .swal2-html-container,
+.swal2-toast.monkey-swal .swal2-content {
 	margin: 0.25rem 0 0;
 	font-size: 0.85rem;
-	color: var(--text-muted);
+	color: var(--text-muted) !important;
+}
+
+.swal2-toast.monkey-swal .swal2-icon {
+	border-color: color-mix(in srgb, var(--accent) 28%, transparent) !important;
 }
 
 .swal2-timer-progress-bar {

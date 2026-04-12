@@ -12,6 +12,7 @@ import {
 	type TypingResult,
 	type UserPreferences
 } from '../lib/typing-api';
+import { countWords, deriveTypingText } from '../lib/typing-text-transform';
 import {
 	applyThemePreference,
 	bindLogout,
@@ -83,22 +84,28 @@ function getQuoteLengthForMode(preferences: UserPreferences): 'short' | 'medium'
 	return 'short';
 }
 
+function shouldRequestNumbersOnlyQuotes(preferences: UserPreferences) {
+	return preferences.numbersEnabled
+		&& (preferences.defaultMode === 'words' || preferences.defaultMode === 'time');
+}
+
 async function getQuoteWithFallback(
 	preferences: UserPreferences,
 	preferredLength?: 'short' | 'medium' | 'long'
 ) {
-	const resolvedLength = preferredLength ?? (preferences.defaultMode === 'quote' ? undefined : getQuoteLengthForMode(preferences));
-	const attempts: Array<{ language?: string; length?: 'short' | 'medium' | 'long' }> = resolvedLength
+	const resolvedLength = preferredLength ?? (preferences.defaultMode === 'quote' ? 'long' : getQuoteLengthForMode(preferences));
+	const hasNumbers = shouldRequestNumbersOnlyQuotes(preferences) ? true : undefined;
+	const attempts: Array<{ language?: string; length?: 'short' | 'medium' | 'long'; hasNumbers?: boolean }> = resolvedLength
 		? [
-			{ language: preferences.language, length: resolvedLength },
-			{ language: preferences.language },
-			{ language: 'english', length: resolvedLength },
-			{}
+			{ language: preferences.language, length: resolvedLength, hasNumbers },
+			{ language: preferences.language, hasNumbers },
+			{ language: 'english', length: resolvedLength, hasNumbers },
+			{ hasNumbers }
 		]
 		: [
-			{ language: preferences.language },
-			{ language: 'english' },
-			{}
+			{ language: preferences.language, hasNumbers },
+			{ language: 'english', hasNumbers },
+			{ hasNumbers }
 		];
 
 	let lastError: unknown = null;
@@ -125,15 +132,6 @@ function getPreferredLengthForWordsMode(wordCount: WordModeCount): 'short' | 'me
 	return 'long';
 }
 
-function sliceTextToWordCount(text: string, wordCount: WordModeCount) {
-	const tokens = text.match(/\S+\s*/g) || [];
-	return tokens.slice(0, wordCount).join('').trim();
-}
-
-function countWords(text: string) {
-	return text.trim().split(/\s+/).filter(Boolean).length;
-}
-
 function getCorrectPrefixLength(input: string, target: string) {
 	const comparableLength = Math.min(input.length, target.length);
 	for (let index = 0; index < comparableLength; index += 1) {
@@ -153,7 +151,7 @@ function countCompletedWords(input: string, target: string) {
 	return tokens.length + (endsWithCompleteWord ? 1 : 0);
 }
 
-function createSyntheticQuote(text: string, source: string | null, language: string, length: TypingQuote['length']): TypingQuote {
+function createSyntheticQuote(text: string, source: string | null, language: string, length: TypingQuote['length'], hasNumbers = false): TypingQuote {
 	const now = new Date().toISOString();
 
 	return {
@@ -162,6 +160,7 @@ function createSyntheticQuote(text: string, source: string | null, language: str
 		source,
 		language,
 		length,
+		hasNumbers,
 		tags: ['synthetic'],
 		createdAt: now,
 		updatedAt: now
@@ -174,22 +173,46 @@ async function buildWordsModeQuote(preferences: UserPreferences, wordCount: Word
 	let combinedText = '';
 	let attempts = 0;
 
-	while (countWords(combinedText) < wordCount && attempts < 8) {
+	while (
+		countWords(
+			deriveTypingText({
+				baseText: combinedText,
+				language: collectedQuotes[0]?.language || preferences.language,
+				mode: 'words',
+				wordCount,
+				punctuationEnabled: preferences.punctuationEnabled,
+				numbersEnabled: preferences.numbersEnabled,
+				quoteHasNumbers: collectedQuotes.some((quote) => quote.hasNumbers)
+			})
+		) < wordCount
+		&& attempts < 8
+	) {
 		attempts += 1;
 		const quote = await getQuoteWithFallback(preferences, preferredLength);
 		collectedQuotes.push(quote);
 		combinedText = [...new Set(collectedQuotes.map((item) => item.text.trim()).filter(Boolean))].join(' ');
 	}
 
-	if (countWords(combinedText) < wordCount) {
+	if (
+		countWords(
+			deriveTypingText({
+				baseText: combinedText,
+				language: collectedQuotes[0]?.language || preferences.language,
+				mode: 'words',
+				wordCount,
+				punctuationEnabled: preferences.punctuationEnabled,
+				numbersEnabled: preferences.numbersEnabled,
+				quoteHasNumbers: collectedQuotes.some((quote) => quote.hasNumbers)
+			})
+		) < wordCount
+	) {
 		throw new Error(`No se pudo preparar un texto de ${wordCount} palabras con la seed disponible.`);
 	}
 
-	const text = sliceTextToWordCount(combinedText, wordCount);
 	const language = collectedQuotes[0]?.language || preferences.language;
 	const source = `Words seed mix • ${wordCount} words`;
 
-	return createSyntheticQuote(text, source, language, preferredLength);
+	return createSyntheticQuote(combinedText, source, language, preferredLength, collectedQuotes.some((quote) => quote.hasNumbers));
 }
 
 function getModeLabel(mode: UserPreferences['defaultMode']) {
@@ -435,8 +458,11 @@ export function initHomePage() {
 
 	const playTone = createTonePlayer();
 	let resultChartInstance: Chart<'line' | 'scatter', ChartPoint[]> | null = null;
+	const modeSupportsTextSanitizers = () => state.preferences.defaultMode === 'words' || state.preferences.defaultMode === 'time';
+	const shouldShowFinishZenAction = () => state.preferences.defaultMode === 'zen' && textArea.value.trim().length > 0;
 	const state = {
 		preferences: { ...DEFAULT_PREFERENCES } as UserPreferences,
+		quoteSeed: null as TypingQuote | null,
 		quote: null as TypingQuote | null,
 		wordCount: DEFAULT_WORD_MODE_COUNT,
 		resultQuoteId: null as string | null,
@@ -587,6 +613,13 @@ export function initHomePage() {
 		const errorAnchor = roundMetric(maxSpeed * 1.08);
 		const yAxisMax = roundMetric(Math.max(errorAnchor, maxSpeed) * 1.08);
 		const chartContext = resultChart.getContext('2d');
+		const rootStyles = window.getComputedStyle(document.documentElement);
+		const chartColors = {
+			text: rootStyles.getPropertyValue('--text').trim() || '#f7f1dd',
+			textMuted: rootStyles.getPropertyValue('--text-muted').trim() || 'rgba(247, 241, 221, 0.68)',
+			borderStrong: rootStyles.getPropertyValue('--border-strong').trim() || 'rgba(224, 193, 109, 0.24)',
+			surfaceStrong: rootStyles.getPropertyValue('--surface-strong').trim() || 'rgba(30, 31, 34, 0.94)'
+		};
 
 		if (!chartContext) {
 			return;
@@ -625,13 +658,13 @@ export function initHomePage() {
 						{
 							label: 'RAW',
 							data: toChartPoints(samples, 'rawWpm'),
-							borderColor: 'rgba(255, 255, 255, 0.95)',
-							backgroundColor: 'rgba(255, 255, 255, 0.14)',
+							borderColor: chartColors.textMuted,
+							backgroundColor: 'transparent',
 							borderWidth: 2.2,
 							borderDash: [8, 6],
 							pointRadius: 1.6,
 							pointHoverRadius: 4,
-							pointBackgroundColor: 'rgba(255, 255, 255, 0.95)',
+							pointBackgroundColor: chartColors.textMuted,
 							pointBorderWidth: 0,
 							tension: 0.28
 						},
@@ -664,11 +697,11 @@ export function initHomePage() {
 						display: false
 					},
 					tooltip: {
-						backgroundColor: 'rgba(17, 17, 17, 0.92)',
-						borderColor: 'rgba(241, 235, 223, 0.12)',
+						backgroundColor: chartColors.surfaceStrong,
+						borderColor: chartColors.borderStrong,
 						borderWidth: 1,
-						titleColor: '#f1ebdf',
-						bodyColor: 'rgba(241, 235, 223, 0.88)',
+						titleColor: chartColors.text,
+						bodyColor: chartColors.textMuted,
 						padding: 10,
 						callbacks: {
 							title(items) {
@@ -691,13 +724,14 @@ export function initHomePage() {
 						min: 0,
 						max: maxDurationSeconds,
 						grid: {
-							color: 'rgba(241, 235, 223, 0.08)'
+							display: false,
+							drawTicks: true
 						},
 						border: {
-							color: 'rgba(241, 235, 223, 0.12)'
+							color: chartColors.borderStrong
 						},
 						ticks: {
-							color: 'rgba(241, 235, 223, 0.72)',
+							color: chartColors.textMuted,
 							font: {
 								family: 'var(--font-mono)',
 								size: 11
@@ -709,7 +743,7 @@ export function initHomePage() {
 						title: {
 							display: true,
 							text: 'time',
-							color: 'rgba(241, 235, 223, 0.72)',
+							color: chartColors.textMuted,
 							font: {
 								family: 'var(--font-mono)',
 								size: 11,
@@ -721,13 +755,14 @@ export function initHomePage() {
 						min: 0,
 						max: yAxisMax,
 						grid: {
-							color: 'rgba(241, 235, 223, 0.08)'
+							display: false,
+							drawTicks: true
 						},
 						border: {
-							color: 'rgba(241, 235, 223, 0.12)'
+							color: chartColors.borderStrong
 						},
 						ticks: {
-							color: 'rgba(241, 235, 223, 0.72)',
+							color: chartColors.textMuted,
 							font: {
 								family: 'var(--font-mono)',
 								size: 11
@@ -739,7 +774,7 @@ export function initHomePage() {
 						title: {
 							display: true,
 							text: 'wpm',
-							color: 'rgba(241, 235, 223, 0.72)',
+							color: chartColors.textMuted,
 							font: {
 								family: 'var(--font-mono)',
 								size: 11,
@@ -763,6 +798,16 @@ export function initHomePage() {
 		configButtons.forEach((button) => {
 			const prefPatch = button.dataset.prefPatch ? JSON.parse(button.dataset.prefPatch) as Partial<UserPreferences> : null;
 			const key = button.dataset.prefKey as keyof UserPreferences | undefined;
+			const isTextSanitizerToggle = key === 'punctuationEnabled' || key === 'numbersEnabled';
+			const supportsTextSanitizers = modeSupportsTextSanitizers();
+
+			if (isTextSanitizerToggle) {
+				button.hidden = !supportsTextSanitizers;
+				button.disabled = !supportsTextSanitizers || state.isUpdatingPreferences;
+			} else {
+				button.hidden = false;
+			}
+
 			if (!key) {
 				if (prefPatch) {
 					const isPatchActive = Object.entries(prefPatch).every(([patchKey, patchValue]) => state.preferences[patchKey as keyof UserPreferences] === patchValue);
@@ -778,7 +823,9 @@ export function initHomePage() {
 				: String(state.preferences[key]) === String(button.dataset.prefValue || '');
 
 			button.classList.toggle('is-active', isActive);
-			button.disabled = state.isUpdatingPreferences;
+			if (!isTextSanitizerToggle) {
+				button.disabled = state.isUpdatingPreferences;
+			}
 		});
 
 		configSelects.forEach((select) => {
@@ -804,8 +851,28 @@ export function initHomePage() {
 		});
 
 		finishZenButtons.forEach((button) => {
-			button.hidden = state.preferences.defaultMode !== 'zen';
+			button.hidden = !shouldShowFinishZenAction();
 		});
+	};
+
+	const syncDisplayedQuoteFromSeed = () => {
+		if (!state.quoteSeed) {
+			state.quote = null;
+			return;
+		}
+
+		state.quote = {
+			...state.quoteSeed,
+			text: deriveTypingText({
+				baseText: state.quoteSeed.text,
+				language: state.quoteSeed.language,
+				mode: state.preferences.defaultMode,
+				quoteHasNumbers: state.quoteSeed.hasNumbers,
+				wordCount: state.wordCount,
+				punctuationEnabled: state.preferences.punctuationEnabled,
+				numbersEnabled: state.preferences.numbersEnabled
+			})
+		};
 	};
 
 	const getProgressLabel = () => {
@@ -1083,6 +1150,7 @@ export function initHomePage() {
 		updateStats(metrics, timeLabel);
 		renderQuoteText(quoteText, state.quote.text, textArea.value, state.preferences.defaultMode, state.completed);
 		syncQuoteViewport();
+		syncPreferenceButtons();
 
 		if (metrics.mistakes > state.lastMistakeCount) {
 			playTone(state.preferences.soundEnabled, 'error');
@@ -1124,22 +1192,27 @@ export function initHomePage() {
 				: mode === 'words'
 					? `Preparando words ${state.wordCount}...`
 					: 'Cargando quote desde el backend...';
-		setStatus(status, loadingMessage, 'info');
+		let loadingStatusTimer = window.setTimeout(() => {
+			setStatus(status, loadingMessage, 'info');
+		}, 180);
 		textArea.setAttribute('disabled', 'true');
 
 		try {
 			if (mode === 'zen') {
-				state.quote = createSyntheticQuote('', null, state.preferences.language, 'short');
+				state.quoteSeed = createSyntheticQuote('', null, state.preferences.language, 'short');
+				syncDisplayedQuoteFromSeed();
 				state.resultQuoteId = null;
 				state.resultQuoteSource = null;
 				quoteSource.textContent = `Zen mode • ${getLanguageLabel(state.preferences.language)} • Ctrl+Enter para terminar`;
 			} else if (mode === 'words') {
-				state.quote = await buildWordsModeQuote(state.preferences, state.wordCount);
+				state.quoteSeed = await buildWordsModeQuote(state.preferences, state.wordCount);
+				syncDisplayedQuoteFromSeed();
 				state.resultQuoteId = null;
 				state.resultQuoteSource = state.quote.source;
 				quoteSource.textContent = `${state.quote.source} • ${getLanguageLabel(state.quote.language)}`;
 			} else {
-				state.quote = await getQuoteWithFallback(state.preferences);
+				state.quoteSeed = await getQuoteWithFallback(state.preferences);
+				syncDisplayedQuoteFromSeed();
 				state.resultQuoteId = state.quote.id;
 				state.resultQuoteSource = state.quote.source;
 				quoteSource.textContent = state.quote.source
@@ -1148,8 +1221,10 @@ export function initHomePage() {
 			}
 			syncPreferenceLabels();
 			resetRun();
+			window.clearTimeout(loadingStatusTimer);
 			clearStatus(status);
 		} catch (error) {
+			window.clearTimeout(loadingStatusTimer);
 			if (error instanceof ApiError && error.status === 401) {
 				handleAuthFailure();
 				return;
@@ -1157,6 +1232,7 @@ export function initHomePage() {
 
 			setStatus(status, error instanceof Error ? error.message : 'No se pudo obtener una quote.', 'error');
 		} finally {
+			window.clearTimeout(loadingStatusTimer);
 			window.requestAnimationFrame(() => {
 				setQuoteSwitchingState(false);
 			});
@@ -1180,10 +1256,18 @@ export function initHomePage() {
 		try {
 			state.preferences = await updateMyPreferences(session, payload);
 			applyThemePreference(state.preferences.theme);
+			syncDisplayedQuoteFromSeed();
 			syncPreferenceLabels();
 
-			if (payload.language || payload.defaultMode || payload.timeDuration) {
+			if (
+				payload.language
+				|| payload.defaultMode
+				|| payload.timeDuration
+				|| (payload.numbersEnabled !== undefined && modeSupportsTextSanitizers())
+			) {
 				await loadQuote();
+			} else if (payload.punctuationEnabled !== undefined || payload.numbersEnabled !== undefined) {
+				resetRun();
 			}
 		} catch (error) {
 			if (error instanceof ApiError && error.status === 401) {

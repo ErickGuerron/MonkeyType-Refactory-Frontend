@@ -6,6 +6,8 @@ export interface UserPreferences {
 	defaultMode: 'time' | 'words' | 'quote' | 'zen' | 'custom';
 	timeDuration: 30 | 60 | 120;
 	showLiveWpm: boolean;
+	punctuationEnabled: boolean;
+	numbersEnabled: boolean;
 	soundEnabled: boolean;
 }
 
@@ -15,6 +17,7 @@ export interface TypingQuote {
 	source: string | null;
 	language: string;
 	length: 'short' | 'medium' | 'long';
+	hasNumbers: boolean;
 	tags: string[];
 	createdAt: string;
 	updatedAt: string;
@@ -58,8 +61,44 @@ export const DEFAULT_PREFERENCES: UserPreferences = {
 	defaultMode: 'time',
 	timeDuration: 30,
 	showLiveWpm: true,
+	punctuationEnabled: false,
+	numbersEnabled: false,
 	soundEnabled: false
 };
+
+const PREFERENCES_STORAGE_KEY = 'monkeytype.user-preferences';
+
+function mergeWithDefaultPreferences(preferences: Partial<UserPreferences> | undefined) {
+	return {
+		...DEFAULT_PREFERENCES,
+		...preferences
+	};
+}
+
+export function readCachedPreferences() {
+	if (typeof window === 'undefined') {
+		return null;
+	}
+
+	try {
+		const raw = window.localStorage.getItem(PREFERENCES_STORAGE_KEY);
+		if (!raw) {
+			return null;
+		}
+
+		return mergeWithDefaultPreferences(JSON.parse(raw) as Partial<UserPreferences>);
+	} catch {
+		return null;
+	}
+}
+
+export function writeCachedPreferences(preferences: UserPreferences) {
+	if (typeof window === 'undefined') {
+		return;
+	}
+
+	window.localStorage.setItem(PREFERENCES_STORAGE_KEY, JSON.stringify(preferences));
+}
 
 function createAuthHeaders(session: SessionPayload, hasBody = false) {
 	return {
@@ -82,12 +121,12 @@ async function parseResponse<T>(response: Response) {
 	return payload.data;
 }
 
-function createQuery(params: Record<string, string | undefined>) {
+function createQuery(params: Record<string, string | boolean | undefined>) {
 	const query = new URLSearchParams();
 
 	Object.entries(params).forEach(([key, value]) => {
-		if (value) {
-			query.set(key, value);
+		if (value !== undefined) {
+			query.set(key, String(value));
 		}
 	});
 
@@ -95,7 +134,7 @@ function createQuery(params: Record<string, string | undefined>) {
 	return serialized ? `?${serialized}` : '';
 }
 
-export async function getRandomQuote(filters: { language?: string; length?: 'short' | 'medium' | 'long' } = {}) {
+export async function getRandomQuote(filters: { language?: string; length?: 'short' | 'medium' | 'long'; hasNumbers?: boolean } = {}) {
 	const response = await fetch(`${API_BASE_URL}/quotes/random${createQuery(filters)}`);
 	const data = await parseResponse<{ quote: TypingQuote }>(response);
 	return data.quote;
@@ -124,10 +163,9 @@ export async function getMyPreferences(session: SessionPayload) {
 		headers: createAuthHeaders(session)
 	});
 	const data = await parseResponse<{ preferences: UserPreferences }>(response);
-	return {
-		...DEFAULT_PREFERENCES,
-		...data.preferences
-	};
+	const preferences = mergeWithDefaultPreferences(data.preferences);
+	writeCachedPreferences(preferences);
+	return preferences;
 }
 
 export async function updateMyPreferences(session: SessionPayload, payload: Partial<UserPreferences>) {
@@ -137,8 +175,7 @@ export async function updateMyPreferences(session: SessionPayload, payload: Part
 		body: JSON.stringify(payload)
 	});
 	const data = await parseResponse<{ preferences: UserPreferences }>(response);
-	return {
-		...DEFAULT_PREFERENCES,
-		...data.preferences
-	};
+	const preferences = mergeWithDefaultPreferences(data.preferences);
+	writeCachedPreferences(preferences);
+	return preferences;
 }

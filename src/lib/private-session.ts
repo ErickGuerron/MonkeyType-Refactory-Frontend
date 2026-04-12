@@ -5,6 +5,8 @@ type ThemePreference = 'system' | 'dark' | 'light';
 
 let systemThemeListenerBound = false;
 
+const THEME_PREFERENCE_STORAGE_KEY = 'monkeytype.theme-preference';
+
 export function redirectToLogin() {
 	const next = `${window.location.pathname}${window.location.search}`;
 	window.location.href = `/login?next=${encodeURIComponent(next)}`;
@@ -84,11 +86,17 @@ function resolveSystemTheme() {
 	return window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
 }
 
+function persistThemePreference(preference: ThemePreference) {
+	window.localStorage.setItem(THEME_PREFERENCE_STORAGE_KEY, preference);
+}
+
 function updateThemeAttribute(preference: ThemePreference) {
 	const resolvedTheme = preference === 'system' ? resolveSystemTheme() : preference;
 	document.documentElement.dataset.userTheme = resolvedTheme;
+	document.documentElement.dataset.themePreference = preference;
 	document.body.dataset.userTheme = resolvedTheme;
 	document.body.dataset.themePreference = preference;
+	persistThemePreference(preference);
 }
 
 export function applyThemePreference(preference: string) {
