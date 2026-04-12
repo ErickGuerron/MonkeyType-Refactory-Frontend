@@ -23,6 +23,7 @@ import {
 	setStatus,
 	syncCurrentUser
 } from '../lib/private-session';
+import { getCurrentUiLocale, t } from '../lib/i18n';
 
 interface TypingMetrics {
 	wpm: number;
@@ -121,7 +122,7 @@ async function getQuoteWithFallback(
 		}
 	}
 
-	throw lastError instanceof Error ? lastError : new Error('No se pudo obtener una quote.');
+	throw lastError instanceof Error ? lastError : new Error(t('home.error.quoteUnavailable'));
 }
 
 function getPreferredLengthForWordsMode(wordCount: WordModeCount): 'short' | 'medium' | 'long' {
@@ -206,7 +207,7 @@ async function buildWordsModeQuote(preferences: UserPreferences, wordCount: Word
 			})
 		) < wordCount
 	) {
-		throw new Error(`No se pudo preparar un texto de ${wordCount} palabras con la seed disponible.`);
+		throw new Error(t('home.error.wordsSeedUnavailable', { count: wordCount }));
 	}
 
 	const language = collectedQuotes[0]?.language || preferences.language;
@@ -216,9 +217,10 @@ async function buildWordsModeQuote(preferences: UserPreferences, wordCount: Word
 }
 
 function getModeLabel(mode: UserPreferences['defaultMode']) {
+	const isSpanish = getCurrentUiLocale() === 'es';
 	const labels: Record<UserPreferences['defaultMode'], string> = {
-		time: 'Time',
-		words: 'Words',
+		time: isSpanish ? 'Tiempo' : 'Time',
+		words: isSpanish ? 'Palabras' : 'Words',
 		quote: 'Quote',
 		zen: 'Zen',
 		custom: 'Custom'
@@ -229,11 +231,11 @@ function getModeLabel(mode: UserPreferences['defaultMode']) {
 
 function getModeDisplayLabel(preferences: UserPreferences, wordCount: WordModeCount) {
 	if (preferences.defaultMode === 'time') {
-		return `${getModeLabel(preferences.defaultMode)} ${preferences.timeDuration}s`;
+		return t('home.mode.timeDisplay', { duration: preferences.timeDuration });
 	}
 
 	if (preferences.defaultMode === 'words') {
-		return `${getModeLabel(preferences.defaultMode)} ${wordCount}`;
+		return t('home.mode.wordsDisplay', { count: wordCount });
 	}
 
 	return getModeLabel(preferences.defaultMode);
@@ -241,7 +243,7 @@ function getModeDisplayLabel(preferences: UserPreferences, wordCount: WordModeCo
 
 function getLanguageLabel(language: string) {
 	const normalized = language.toLowerCase();
-	return normalized === 'spanish' ? 'Español' : normalized === 'english' ? 'English' : language;
+	return normalized === 'spanish' ? t('settings.language.spanish') : normalized === 'english' ? t('settings.language.english') : language;
 }
 
 function formatPercentage(value: number) {
@@ -284,7 +286,7 @@ function computeMetrics(
 		startedAt ? Math.ceil((Date.now() - startedAt) / 1000) : 1
 	);
 	const durationInMinutes = durationInSeconds / 60;
-	const rawWpm = typedCharacters === 0 ? 0 : typedCharacters / 5 / durationInMinutes;
+	const rawWpm = totalKeyStrokes === 0 ? 0 : totalKeyStrokes / 5 / durationInMinutes;
 	const wpm = correctCharacters === 0 ? 0 : correctCharacters / 5 / durationInMinutes;
 	const normalizedTotalKeyStrokes = Math.max(totalKeyStrokes, typedCharacters, 1);
 	const normalizedIncorrectKeyStrokes = Math.max(0, Math.min(incorrectKeyStrokes, normalizedTotalKeyStrokes));
@@ -347,7 +349,7 @@ function renderQuoteText(
 
 function renderHistory(target: HTMLElement, results: TypingResult[]) {
 	if (results.length === 0) {
-		target.innerHTML = '<li class="typing-history__empty">Todavía no guardaste resultados. Tu próxima corrida arranca el historial.</li>';
+		target.innerHTML = `<li class="typing-history__empty">${t('home.historyEmpty')}</li>`;
 		return;
 	}
 
@@ -358,7 +360,7 @@ function renderHistory(target: HTMLElement, results: TypingResult[]) {
 				<li>
 					<div>
 						<strong>${formatMetric(result.wpm)} WPM</strong>
-						<span>${formatMetric(result.accuracy)}% accuracy • ${formatDuration(result.duration)}</span>
+						<span>${formatMetric(result.accuracy)}% ${t('common.accuracy')} • ${formatDuration(result.duration)}</span>
 					</div>
 					<div>
 						<strong>${getModeLabel(result.mode as UserPreferences['defaultMode'])}</strong>
@@ -496,13 +498,13 @@ export function initHomePage() {
 
 		const rollingDeltaSeconds = Math.max((elapsedMs - (baselineForWpm?.elapsedMs || 0)) / 1000, 0.25);
 		const burstDeltaSeconds = Math.max((elapsedMs - (baselineForBurst?.elapsedMs || 0)) / 1000, 0.12);
-		const rollingTypedCharacters = Math.max(metrics.typedCharacters - (baselineForWpm?.typedCharactersAtSample || 0), 0);
 		const rollingCorrectCharacters = Math.max(metrics.correctCharacters - (baselineForWpm?.correctCharactersAtSample || 0), 0);
-		const burstTypedCharacters = Math.max(metrics.typedCharacters - (baselineForBurst?.typedCharactersAtSample || 0), 0);
+		const rollingRawKeyStrokes = Math.max(metrics.totalKeyStrokes - (baselineForWpm?.totalKeyStrokesAtSample || 0), 0);
+		const burstRawKeyStrokes = Math.max(metrics.totalKeyStrokes - (baselineForBurst?.totalKeyStrokesAtSample || 0), 0);
 
-		const instantaneousRawWpm = roundMetric((rollingTypedCharacters / 5) / (rollingDeltaSeconds / 60));
+		const instantaneousRawWpm = roundMetric((rollingRawKeyStrokes / 5) / (rollingDeltaSeconds / 60));
 		const instantaneousWpm = roundMetric((rollingCorrectCharacters / 5) / (rollingDeltaSeconds / 60));
-		const burstWpm = roundMetric((burstTypedCharacters / 5) / (burstDeltaSeconds / 60));
+		const burstWpm = roundMetric((burstRawKeyStrokes / 5) / (burstDeltaSeconds / 60));
 
 		const sample: MetricSample = {
 			elapsedMs,
@@ -533,7 +535,7 @@ export function initHomePage() {
 			elapsedMs: Math.max(metrics.durationInSeconds * 1000, 1000),
 			wpm: metrics.wpm,
 			rawWpm: metrics.rawWpm,
-			burstWpm: metrics.rawWpm,
+			burstWpm: Math.max(metrics.rawWpm, metrics.wpm),
 			typedCharactersAtSample: metrics.typedCharacters,
 			correctCharactersAtSample: metrics.correctCharacters,
 			totalKeyStrokesAtSample: metrics.totalKeyStrokes,
@@ -709,13 +711,13 @@ export function initHomePage() {
 								return `${roundMetric(value)}s`;
 							},
 							label(item) {
-								if (item.dataset.label === 'ERRORS') {
-									return 'Error';
-								}
-
-								return `${item.dataset.label}: ${formatMetric(item.parsed.y)} WPM`;
+							if (item.dataset.label === 'ERRORS') {
+								return t('home.chart.tooltipError');
 							}
+
+							return t('home.chart.tooltipSeries', { label: item.dataset.label || '', value: formatMetric(item.parsed.y) });
 						}
+					}
 					}
 				},
 				scales: {
@@ -742,7 +744,7 @@ export function initHomePage() {
 						},
 						title: {
 							display: true,
-							text: 'time',
+							text: t('home.chart.timeAxis'),
 							color: chartColors.textMuted,
 							font: {
 								family: 'var(--font-mono)',
@@ -773,7 +775,7 @@ export function initHomePage() {
 						},
 						title: {
 							display: true,
-							text: 'wpm',
+							text: t('home.chart.wpmAxis'),
 							color: chartColors.textMuted,
 							font: {
 								family: 'var(--font-mono)',
@@ -895,16 +897,16 @@ export function initHomePage() {
 	const syncPreferenceLabels = () => {
 		statMode.textContent = getModeDisplayLabel(state.preferences, state.wordCount);
 		statTimerLabel.textContent = state.preferences.defaultMode === 'time'
-			? 'time'
+			? t('home.time')
 			: state.preferences.defaultMode === 'zen'
-				? 'elapsed'
-				: 'words';
+				? t('home.elapsed')
+				: t('home.words');
 		statLanguage.textContent = getLanguageLabel(state.quote?.language || state.preferences.language);
 		typingHint.textContent = state.preferences.defaultMode === 'zen'
-			? 'write freely — ctrl+enter or finish zen when you want to save the run'
+			? t('home.typingHintZen')
 			: state.preferences.defaultMode === 'words'
-				? `type the ${state.wordCount}-word target until completion`
-				: 'type directly over the quote and keep your focus in the line';
+				? t('home.typingHintWords', { count: state.wordCount })
+				: t('home.typingHint');
 		liveWpmCard.hidden = !state.preferences.showLiveWpm;
 		syncPreferenceButtons();
 	};
@@ -1085,8 +1087,12 @@ export function initHomePage() {
 		playTone(state.preferences.soundEnabled, 'success');
 
 		showResultModal();
-		resultTitle.textContent = reason === 'timeout' ? 'Tiempo cumplido' : 'Test completado';
-		resultSummary.textContent = `${formatMetric(metrics.wpm)} WPM • ${formatPercentage(metrics.accuracy)} accuracy • ${metrics.mistakes} errores`;
+		resultTitle.textContent = reason === 'timeout' ? t('home.resultTimeout') : t('home.resultCompleted');
+		resultSummary.textContent = t('home.resultSummary', {
+			wpm: formatMetric(metrics.wpm),
+			accuracy: `${formatPercentage(metrics.accuracy)} ${t('common.accuracy')}`,
+			errors: metrics.mistakes
+		});
 		resultMetricWpm.textContent = formatMetric(metrics.wpm);
 		resultMetricRaw.textContent = formatMetric(metrics.rawWpm);
 		resultMetricAccuracy.textContent = formatPercentage(metrics.accuracy);
@@ -1111,13 +1117,13 @@ export function initHomePage() {
 			state.results = [savedResult, ...state.results];
 			renderHistory(historyList, state.results);
 			void showToast({
-				title: 'Resultado guardado',
-				text: 'Tu corrida ya quedó en el historial.',
+				title: t('home.toastSavedTitle'),
+				text: t('home.toastSavedBody'),
 				icon: 'success',
 				timer: 1800
 			});
 		} catch (error) {
-			setStatus(status, error instanceof Error ? error.message : 'No se pudo guardar el resultado.', 'error');
+			setStatus(status, error instanceof Error ? error.message : t('home.error.saveResult'), 'error');
 		}
 	};
 
@@ -1188,10 +1194,10 @@ export function initHomePage() {
 		const mode = state.preferences.defaultMode;
 		const loadingMessage =
 			mode === 'zen'
-				? 'Preparando zen mode...'
+				? t('home.loadingZen')
 				: mode === 'words'
-					? `Preparando words ${state.wordCount}...`
-					: 'Cargando quote desde el backend...';
+					? t('home.loadingWords', { count: state.wordCount })
+					: t('home.loadingQuote');
 		let loadingStatusTimer = window.setTimeout(() => {
 			setStatus(status, loadingMessage, 'info');
 		}, 180);
@@ -1203,7 +1209,7 @@ export function initHomePage() {
 				syncDisplayedQuoteFromSeed();
 				state.resultQuoteId = null;
 				state.resultQuoteSource = null;
-				quoteSource.textContent = `Zen mode • ${getLanguageLabel(state.preferences.language)} • Ctrl+Enter para terminar`;
+				quoteSource.textContent = t('home.zenSource', { language: getLanguageLabel(state.preferences.language) });
 			} else if (mode === 'words') {
 				state.quoteSeed = await buildWordsModeQuote(state.preferences, state.wordCount);
 				syncDisplayedQuoteFromSeed();
@@ -1217,7 +1223,7 @@ export function initHomePage() {
 				state.resultQuoteSource = state.quote.source;
 				quoteSource.textContent = state.quote.source
 					? `${state.quote.source} • ${getLanguageLabel(state.quote.language)}`
-					: `Quote backend • ${getLanguageLabel(state.quote.language)}`;
+					: t('home.quoteBackendSource', { language: getLanguageLabel(state.quote.language) });
 			}
 			syncPreferenceLabels();
 			resetRun();
@@ -1230,7 +1236,7 @@ export function initHomePage() {
 				return;
 			}
 
-			setStatus(status, error instanceof Error ? error.message : 'No se pudo obtener una quote.', 'error');
+			setStatus(status, error instanceof Error ? error.message : t('home.error.loadQuote'), 'error');
 		} finally {
 			window.clearTimeout(loadingStatusTimer);
 			window.requestAnimationFrame(() => {
@@ -1277,7 +1283,7 @@ export function initHomePage() {
 
 			state.preferences = previousPreferences;
 			syncPreferenceLabels();
-			setStatus(status, error instanceof Error ? error.message : 'No se pudieron actualizar las preferencias.', 'error');
+			setStatus(status, error instanceof Error ? error.message : t('home.error.updatePreferences'), 'error');
 		} finally {
 			state.isUpdatingPreferences = false;
 			syncPreferenceButtons();
@@ -1509,6 +1515,19 @@ export function initHomePage() {
 		syncQuoteViewport();
 	});
 
+	window.addEventListener('monkeytype:localechange', () => {
+		renderHistory(historyList, state.results);
+		syncPreferenceLabels();
+		if (state.quote) {
+			const sourceText = state.preferences.defaultMode === 'zen'
+				? t('home.zenSource', { language: getLanguageLabel(state.preferences.language) })
+				: state.quote.source
+					? `${state.quote.source} • ${getLanguageLabel(state.quote.language)}`
+					: t('home.quoteBackendSource', { language: getLanguageLabel(state.quote.language) });
+			quoteSource.textContent = sourceText;
+		}
+	});
+
 	void Promise.all([getMyPreferences(session), getMyResults(session)])
 		.then(async ([preferences, results]) => {
 			state.preferences = preferences;
@@ -1524,6 +1543,6 @@ export function initHomePage() {
 				return;
 			}
 
-			await showErrorAlert(error instanceof Error ? error.message : 'No se pudo cargar la experiencia de typing.');
+			await showErrorAlert(error instanceof Error ? error.message : t('home.error.loadExperience'));
 		});
 }

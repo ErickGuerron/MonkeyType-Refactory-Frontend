@@ -1,4 +1,5 @@
 import { clearSession, getCurrentUser, readSession, type PublicUser, type SessionPayload } from './auth-api';
+import { getCurrentUiLocale } from './i18n';
 
 type StatusTone = 'error' | 'success' | 'info';
 type ThemePreference = 'system' | 'dark' | 'light';
@@ -75,7 +76,7 @@ export function clearStatus(target: HTMLElement | null) {
 	target.classList.remove('is-visible');
 }
 
-export function formatDateTime(value: string, locale = 'es-EC') {
+export function formatDateTime(value: string, locale = getCurrentUiLocale() === 'es' ? 'es-EC' : 'en-US') {
 	return new Intl.DateTimeFormat(locale, {
 		dateStyle: 'medium',
 		timeStyle: 'short'

@@ -10,6 +10,7 @@ import {
 } from '../lib/auth-api';
 import type { GenericApiPayload } from '../lib/auth-api';
 import { showErrorAlert, showSuccessAlert, showToast } from '../lib/alerts';
+import { getCurrentUiLocale, t } from '../lib/i18n';
 
 type FormMode = 'login' | 'register' | 'reset' | 'reset-confirm';
 
@@ -70,14 +71,14 @@ async function submitAuthForm(form: HTMLFormElement, mode: FormMode) {
 		if (mode === 'reset') {
 			const email = String(formData.get('email') || '').trim();
 			if (!email) {
-				throw new ApiError('Ingresá tu email para continuar con la recuperación.', 400);
+				throw new ApiError(t('auth.validation.enterEmail'), 400);
 			}
 
 			await postJson<GenericApiPayload>('/auth/forgot-password', { email });
 			form.reset();
 			await showSuccessAlert(
-				'Revisá tu correo',
-				'Si el email existe en MonkeyType, ya enviamos el enlace de recuperación.'
+				t('auth.reset.checkEmailTitle'),
+				t('auth.reset.checkEmailBody')
 			);
 			return;
 		}
@@ -88,20 +89,20 @@ async function submitAuthForm(form: HTMLFormElement, mode: FormMode) {
 			const token = getResetToken();
 
 			if (!token) {
-				throw new ApiError('Falta el token de recuperación en el enlace.', 400);
+				throw new ApiError(t('auth.validation.missingToken'), 400);
 			}
 
 			if (!password) {
-				throw new ApiError('Ingresá tu nueva contraseña.', 400);
+				throw new ApiError(t('auth.validation.enterNewPassword'), 400);
 			}
 
 			if (password !== confirmPassword) {
-				throw new ApiError('Las contraseñas no coinciden.', 400);
+				throw new ApiError(t('auth.validation.passwordMismatch'), 400);
 			}
 
 			await postJson<GenericApiPayload>('/auth/reset-password', { token, password });
 			form.reset();
-			await showSuccessAlert('Contraseña actualizada', 'Ya podés iniciar sesión con tu nueva contraseña.');
+			await showSuccessAlert(t('auth.reset.updatedTitle'), t('auth.reset.updatedBody'));
 			redirectToPath('/login');
 			return;
 		}
@@ -110,7 +111,7 @@ async function submitAuthForm(form: HTMLFormElement, mode: FormMode) {
 		const password = String(formData.get('password') || '');
 
 		if (!email || !password) {
-			throw new ApiError('Completá los campos requeridos.', 400);
+			throw new ApiError(t('auth.validation.completeRequired'), 400);
 		}
 
 		const body: Record<string, string> = { email, password };
@@ -120,11 +121,11 @@ async function submitAuthForm(form: HTMLFormElement, mode: FormMode) {
 			const confirmPassword = String(formData.get('confirmPassword') || '');
 
 			if (!name) {
-				throw new ApiError('Ingresá un nombre visible para tu cuenta.', 400);
+				throw new ApiError(t('auth.validation.enterVisibleName'), 400);
 			}
 
 			if (password !== confirmPassword) {
-				throw new ApiError('Las contraseñas no coinciden.', 400);
+				throw new ApiError(t('auth.validation.passwordMismatch'), 400);
 			}
 
 			body.name = name;
@@ -133,8 +134,8 @@ async function submitAuthForm(form: HTMLFormElement, mode: FormMode) {
 		const payload = await postAuth(mode === 'login' ? '/auth/login' : '/auth/register', body);
 		saveSession(payload);
 		void showToast({
-			title: mode === 'login' ? 'Login exitoso' : 'Cuenta creada',
-			text: mode === 'login' ? 'Redirigiendo a tu dashboard.' : 'Bienvenido a MonkeyType.',
+			title: mode === 'login' ? t('auth.toast.loginSuccessTitle') : t('auth.toast.registerSuccessTitle'),
+			text: mode === 'login' ? t('auth.toast.loginSuccessBody') : t('auth.toast.registerSuccessBody'),
 			icon: 'success',
 			timer: 1400
 		});
@@ -142,7 +143,7 @@ async function submitAuthForm(form: HTMLFormElement, mode: FormMode) {
 			redirectToPath(getSafeNextPath());
 		}, 900);
 	} catch (error) {
-		const message = error instanceof ApiError ? error.message : 'Ocurrió un error inesperado.';
+		const message = error instanceof ApiError ? error.message : t('auth.unexpectedError');
 		await showErrorAlert(message);
 	} finally {
 		setSubmittingState(form, false);
@@ -164,8 +165,8 @@ export function initAuthForms() {
 			const submitButton = form.querySelector<HTMLButtonElement>('button[type="submit"]');
 			submitButton?.setAttribute('disabled', 'true');
 			void showToast({
-				title: 'Enlace incompleto',
-				text: 'Abrí el link completo del email para poder cambiar la contraseña.',
+				title: t('auth.reset.incompleteLinkTitle'),
+				text: t('auth.reset.incompleteLinkBody'),
 				icon: 'warning',
 				timer: 3200
 			});
@@ -179,7 +180,7 @@ export function initAuthForms() {
 }
 
 function formatTimestamp(value: string) {
-	return new Intl.DateTimeFormat('es-EC', {
+	return new Intl.DateTimeFormat(getCurrentUiLocale() === 'es' ? 'es-EC' : 'en-US', {
 		dateStyle: 'medium',
 		timeStyle: 'short'
 	}).format(new Date(value));
@@ -213,19 +214,19 @@ export function initAppShell() {
 
 	if (userName) userName.textContent = session.user.name;
 	if (userEmail) userEmail.textContent = session.user.email;
-	if (userStored) userStored.textContent = `Token guardado localmente • ${formatTimestamp(session.storedAt)}`;
+	if (userStored) userStored.textContent = t('auth.session.storedToken', { timestamp: formatTimestamp(session.storedAt) });
 	if (tokenValue) tokenValue.textContent = `${session.tokenType} ${session.token.slice(0, 28)}…`;
-	setStatus(status, 'Validando sesión contra /api/auth/me...', 'info');
+	setStatus(status, t('auth.session.validating'), 'info');
 
 	void getCurrentUser(session.token, session.tokenType)
 		.then((payload) => {
 			if (userName) userName.textContent = payload.user.name;
 			if (userEmail) userEmail.textContent = payload.user.email;
-			setStatus(status, 'Sesión validada correctamente contra el backend.', 'success');
+			setStatus(status, t('auth.session.validated'), 'success');
 		})
 		.catch((error) => {
 			clearSession();
-			setStatus(status, error instanceof Error ? `${error.message} Redirigiendo a login...` : 'La sesión expiró. Redirigiendo a login...', 'error');
+			setStatus(status, error instanceof Error ? t('auth.session.redirectingLogin', { message: error.message }) : t('auth.session.expiredRedirecting'), 'error');
 			window.setTimeout(() => {
 				redirectToLogin();
 			}, 350);

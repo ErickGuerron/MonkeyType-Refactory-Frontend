@@ -7,6 +7,7 @@ import {
 	updateMyPreferences,
 	type UserPreferences
 } from '../lib/typing-api';
+import { t } from '../lib/i18n';
 import {
 	applyThemePreference,
 	bindLogout,
@@ -62,14 +63,30 @@ function getDirtyPayload(initial: UserPreferences, current: UserPreferences) {
 }
 
 function describePreferences(target: HTMLElement, preferences: UserPreferences) {
+	const modeLabel =
+		preferences.defaultMode === 'quote'
+			? t('home.mode.quoteDisplay')
+			: preferences.defaultMode === 'zen'
+				? t('home.mode.zenDisplay')
+				: preferences.defaultMode === 'custom'
+					? t('home.mode.customDisplay')
+					: preferences.defaultMode;
 	const modeSummary =
 		preferences.defaultMode === 'time'
-			? `${preferences.defaultMode} ${preferences.timeDuration}s`
+			? t('settings.summary.mode.time', { duration: preferences.timeDuration })
 			: preferences.defaultMode === 'words'
-				? 'words 50/100/150 on home'
-				: preferences.defaultMode;
+				? t('settings.summary.mode.words')
+				: modeLabel;
 
-	target.textContent = `Theme ${preferences.theme} • ${preferences.language} • ${modeSummary} • live WPM ${preferences.showLiveWpm ? 'on' : 'off'} • punctuation ${preferences.punctuationEnabled ? 'on' : 'off'} • numbers ${preferences.numbersEnabled ? 'on' : 'off'} • sound ${preferences.soundEnabled ? 'on' : 'off'}`;
+	target.textContent = t('settings.summary', {
+		theme: t(`settings.theme.${preferences.theme}`),
+		language: t(`settings.language.${preferences.language}`),
+		mode: modeSummary,
+		liveWpm: preferences.showLiveWpm ? t('common.on') : t('common.off'),
+		punctuation: preferences.punctuationEnabled ? t('common.on') : t('common.off'),
+		numbers: preferences.numbersEnabled ? t('common.on') : t('common.off'),
+		sound: preferences.soundEnabled ? t('common.on') : t('common.off')
+	});
 }
 
 export function initSettingsPage() {
@@ -154,8 +171,8 @@ export function initSettingsPage() {
 
 		if (Object.keys(dirtyPayload).length === 0) {
 			void showToast({
-				title: 'Sin cambios',
-				text: 'No hay preferencias nuevas para guardar.',
+				title: t('settings.toast.noChangesTitle'),
+				text: t('settings.toast.noChangesText'),
 				icon: 'info',
 				timer: 1800
 			});
@@ -163,7 +180,7 @@ export function initSettingsPage() {
 		}
 
 		saveButton.disabled = true;
-		setStatus(status, 'Guardando preferencias reales en el backend...', 'info');
+		setStatus(status, t('settings.status.saving'), 'info');
 
 		try {
 			const updatedPreferences = await updateMyPreferences(session, dirtyPayload);
@@ -171,10 +188,10 @@ export function initSettingsPage() {
 			applyPreferencesToForm(form, updatedPreferences);
 			applyThemePreference(updatedPreferences.theme);
 			syncDirtyState();
-			setStatus(status, 'Preferencias actualizadas correctamente.', 'success');
+			setStatus(status, t('settings.status.updated'), 'success');
 			void showToast({
-				title: 'Preferencias guardadas',
-				text: 'Tu configuración ya quedó persistida en el backend.',
+				title: t('settings.toast.savedTitle'),
+				text: t('settings.toast.savedText'),
 				icon: 'success',
 				timer: 2200
 			});
@@ -185,13 +202,13 @@ export function initSettingsPage() {
 			}
 
 			saveButton.disabled = false;
-			setStatus(status, error instanceof Error ? error.message : 'No se pudieron guardar las preferencias.', 'error');
-			await showErrorAlert(error instanceof Error ? error.message : 'No se pudieron guardar las preferencias.');
+			setStatus(status, error instanceof Error ? error.message : t('settings.error.save'), 'error');
+			await showErrorAlert(error instanceof Error ? error.message : t('settings.error.save'));
 		}
 	});
 
 	loadingStatusTimer = window.setTimeout(() => {
-		setStatus(status, 'Cargando preferencias...', 'info');
+		setStatus(status, t('settings.status.loading'), 'info');
 	}, 180);
 	void getMyPreferences(session)
 		.then((preferences) => {
@@ -209,7 +226,11 @@ export function initSettingsPage() {
 				return;
 			}
 
-			setStatus(status, error instanceof Error ? error.message : 'No se pudieron cargar las preferencias.', 'error');
-			await showErrorAlert(error instanceof Error ? error.message : 'No se pudieron cargar las preferencias.');
+			setStatus(status, error instanceof Error ? error.message : t('settings.error.load'), 'error');
+			await showErrorAlert(error instanceof Error ? error.message : t('settings.error.load'));
 		});
+
+	window.addEventListener('monkeytype:localechange', () => {
+		syncDirtyState();
+	});
 }

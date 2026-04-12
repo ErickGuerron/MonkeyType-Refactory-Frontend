@@ -9,61 +9,65 @@ interface LinkItem {
 interface Props {
 	mode: Mode;
 	title: string;
+	titleKey?: string;
 	description: string;
+	descriptionKey?: string;
 	submitLabel: string;
+	submitLabelKey?: string;
 	links?: LinkItem[];
 	note?: string;
+	noteKey?: string;
 }
 
-const { mode, title, description, submitLabel, links = [], note } = Astro.props;
+const { mode, title, titleKey, description, descriptionKey, submitLabel, submitLabelKey, links = [], note, noteKey } = Astro.props;
 
 const formId = `auth-form-${mode}`;
 ---
 
 <article class="auth-form terminal-panel">
 	<div class="auth-form__header">
-		<h1>{title}</h1>
-		<p>{description}</p>
+		<h1 data-i18n={titleKey}>{title}</h1>
+		<p data-i18n={descriptionKey}>{description}</p>
 	</div>
 
-	{note && <p class="auth-form__note">{note}</p>}
+	{note && <p class="auth-form__note" data-i18n={noteKey}>{note}</p>}
 
 	<form class="auth-form__body" data-auth-form data-mode={mode} id={formId} novalidate>
 		{mode === 'register' && (
 			<label class="field">
-				<span>Name</span>
+				<span data-i18n="auth.fieldName">Name</span>
 				<input autocomplete="name" name="name" placeholder="Ada Lovelace" required type="text" />
 			</label>
 		)}
 
 		{mode !== 'reset-confirm' && (
 			<label class="field">
-				<span>Email</span>
-				<input autocomplete="email" name="email" placeholder="name@monkeytype.dev" required type="email" />
+				<span data-i18n="auth.fieldEmail">Email</span>
+				<input autocomplete="email" name="email" placeholder="name@monkeytype.dev" data-i18n-placeholder="auth.form.placeholderEmail" required type="email" />
 			</label>
 		)}
 
 		{mode !== 'reset' && (
 			<label class="field">
-				<span>Password</span>
+				<span data-i18n="auth.fieldPassword">Password</span>
 				<input autocomplete={mode === 'login' ? 'current-password' : 'new-password'} name="password" placeholder="••••••••" required type="password" />
 			</label>
 		)}
 
 		{(mode === 'register' || mode === 'reset-confirm') && (
 			<label class="field">
-				<span>Confirm password</span>
+				<span data-i18n="auth.fieldConfirmPassword">Confirm password</span>
 				<input autocomplete="new-password" name="confirmPassword" placeholder="••••••••" required type="password" />
 			</label>
 		)}
 
-		<button class="button-primary auth-form__submit" type="submit">{submitLabel}</button>
+		<button class="button-primary auth-form__submit" data-i18n={submitLabelKey} type="submit">{submitLabel}</button>
 	</form>
 
 	{links.length > 0 && (
 		<div class="auth-form__links">
 			{links.map((link) => (
-				<a href={link.href}>{link.label}</a>
+				<a href={link.href} data-i18n={link.label}>{link.label}</a>
 			))}
 		</div>
 	)}

@@ -6,10 +6,15 @@ import Layout from './Layout.astro';
 interface Props {
 	title: string;
 	description: string;
+	titleKey?: string;
+	descriptionKey?: string;
 	activeHref?: string;
 	pageEyebrow?: string;
+	pageEyebrowKey?: string;
 	pageTitle: string;
+	pageTitleKey?: string;
 	pageDescription: string;
+	pageDescriptionKey?: string;
 	showPageIntro?: boolean;
 	layoutWidth?: 'default' | 'typing';
 }
@@ -17,25 +22,30 @@ interface Props {
 const {
 	title,
 	description,
+	titleKey,
+	descriptionKey,
 	activeHref = '/home',
 	pageEyebrow = 'Private area',
+	pageEyebrowKey = 'layout.privateArea',
 	pageTitle,
+	pageTitleKey,
 	pageDescription,
+	pageDescriptionKey,
 	showPageIntro = true,
 	layoutWidth = 'default'
 } = Astro.props;
 ---
 
-<Layout title={title} description={description} bodyClass="theme-private">
+<Layout title={title} description={description} titleKey={titleKey} descriptionKey={descriptionKey} bodyClass="theme-private">
 	<div class="page-shell">
 		<AppNavbar mode="private" activeHref={activeHref} />
 
 		<main class:list={['private-layout', layoutWidth === 'typing' ? 'private-layout--typing' : '', layoutWidth === 'typing' ? 'container-wide' : 'container']}>
 			{showPageIntro && (
 				<section class="private-layout__hero terminal-panel">
-					<span class="eyebrow">{pageEyebrow}</span>
-					<h1>{pageTitle}</h1>
-					<p>{pageDescription}</p>
+					<span class="eyebrow" data-i18n={pageEyebrowKey}>{pageEyebrow}</span>
+					<h1 data-i18n={pageTitleKey}>{pageTitle}</h1>
+					<p data-i18n={pageDescriptionKey}>{pageDescription}</p>
 				</section>
 			)}
 

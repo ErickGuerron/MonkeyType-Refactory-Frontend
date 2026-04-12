@@ -5,50 +5,44 @@ import Layout from '../layouts/Layout.astro';
 ---
 
 
-<Layout title="MonkeyType | Landing" description="MonkeyType para escribir con foco, entrar a tu cuenta y seguir tu ritmo.">
+<Layout title="MonkeyType | Landing" titleKey="landing.title" description="MonkeyType to write with focus, access your account, and keep your rhythm." descriptionKey="landing.description">
 	<div class="page-shell">
 		<AppNavbar mode="public" activeHref="/" />
 
 		<main class="landing container">
 			<section class="landing__hero terminal-panel">
 				<div>
-					<span class="eyebrow">Typing focus</span>
-					<h1>Escribí con ritmo, medí tu progreso y dejá tu cuenta siempre lista.</h1>
-					<p>
-						MonkeyType te recibe con una experiencia minimal, oscura y directa al punto: entrar,
-						practicar, volver a tu espacio y ajustar cómo querés sentir cada sesión.
-					</p>
+					<span class="eyebrow" data-i18n="landing.eyebrow">Typing focus</span>
+					<h1 data-i18n="landing.heroTitle">Write with rhythm, measure your progress, and keep your account ready.</h1>
+					<p data-i18n="landing.heroBody">MonkeyType welcomes you with a minimal, dark, and direct experience: sign in, practice, return to your space, and tune how each session should feel.</p>
 				</div>
 
 				<div class="landing__actions">
-					<a class="button-primary" href="/register">Crear cuenta</a>
-					<a class="button-secondary" href="/login">Entrar</a>
-					<a class="button-ghost" href="/home">Ir a mi espacio</a>
+					<a class="button-primary" href="/register" data-i18n="landing.ctaRegister">Create account</a>
+					<a class="button-secondary" href="/login" data-i18n="landing.ctaLogin">Sign in</a>
+					<a class="button-ghost" href="/home" data-i18n="landing.ctaPrivate">Go to my space</a>
 				</div>
 			</section>
 
 			<section class="landing__grid panel-grid">
 				<article class="landing__card terminal-panel">
-					<h2>Tu recorrido</h2>
+					<h2 data-i18n="landing.journeyTitle">Your journey</h2>
 					<ul>
-						<li>Landing pública para descubrir la experiencia.</li>
-						<li>Login y registro para entrar a tu cuenta.</li>
-						<li>Home privada para retomar tu sesión.</li>
-						<li>Configuración para ajustar tu estilo.</li>
+						<li data-i18n="landing.journey1">Public landing page to discover the experience.</li>
+						<li data-i18n="landing.journey2">Login and register to access your account.</li>
+						<li data-i18n="landing.journey3">Private home to resume your session.</li>
+						<li data-i18n="landing.journey4">Settings to tune your style.</li>
 					</ul>
 				</article>
 
 				<article class="landing__card terminal-panel">
-					<h2>Qué encontrás</h2>
-					<p>Una estética terminal cálida, foco visual alto y un flujo pensado para volver rápido a escribir.</p>
+					<h2 data-i18n="landing.findTitle">What you get</h2>
+					<p data-i18n="landing.findBody">A warm terminal aesthetic, strong visual focus, and a flow designed to get you back to typing fast.</p>
 				</article>
 
 				<article class="landing__card terminal-panel">
-					<h2>Cuenta y ajustes</h2>
-					<p>
-						Una vez adentro tenés un home privado y una pantalla de configuración con secciones para
-						comportamiento, apariencia y preferencias generales.
-					</p>
+					<h2 data-i18n="landing.accountTitle">Account and settings</h2>
+					<p data-i18n="landing.accountBody">Once inside, you get a private home and a settings screen with sections for behavior, appearance, and general preferences.</p>
 				</article>
 			</section>
 		</main>

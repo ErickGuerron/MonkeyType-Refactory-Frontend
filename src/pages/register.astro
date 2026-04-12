@@ -5,17 +5,22 @@ import AuthLayout from '../layouts/AuthLayout.astro';
 
 <AuthLayout
 	title="MonkeyType | Register"
-	description="Creá tu cuenta en MonkeyType."
+	titleKey="auth.register.title"
+	description="Create your account in MonkeyType."
+	descriptionKey="auth.register.descriptionMeta"
 	activeHref="/register"
 >
 	<AuthForm
 		mode="register"
-		title="Crear cuenta"
-		description="Completá los datos para registrarte."
-		submitLabel="Crear cuenta"
+		title="Create account"
+		titleKey="auth.register.heading"
+		description="Complete the fields to register."
+		descriptionKey="auth.register.body"
+		submitLabel="Create account"
+		submitLabelKey="auth.register.submit"
 		links={[
-			{ href: '/login', label: 'Ya tengo cuenta' },
-			{ href: '/reset-password', label: 'Necesito recuperar acceso' }
+			{ href: '/login', label: 'auth.register.haveAccount' },
+			{ href: '/reset-password', label: 'auth.register.needRecovery' }
 		]}
 	/>
 </AuthLayout>

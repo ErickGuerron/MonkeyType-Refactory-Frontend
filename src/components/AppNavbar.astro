@@ -35,16 +35,14 @@ const links = (mode === 'public' ? publicLinks : privateLinks).map((link) => ({
 			{links.map((link) => (
 				<a class:list={[link.isActive && 'is-active']} href={link.href}>
 					{link.icon && <span aria-hidden="true">{link.icon}</span>}
-					{link.label}
+					<span data-i18n={link.href === '/' ? 'nav.home' : link.href === '/login' ? 'nav.login' : link.href === '/register' ? 'nav.register' : link.href === '/home' ? 'nav.typing' : 'nav.settings'}>{link.label}</span>
 				</a>
 			))}
 		</nav>
 
-		{mode === 'private' && (
-			<div class="app-navbar__actions">
-				<span class="app-navbar__hint mono">monkey see monkey type</span>
-			</div>
-		)}
+		<div class="app-navbar__actions">
+			{mode === 'private' && <span class="app-navbar__hint mono" data-i18n="nav.hint">monkey see monkey type</span>}
+		</div>
 	</div>
 </header>
 

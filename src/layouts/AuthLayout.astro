@@ -6,17 +6,21 @@ import Layout from './Layout.astro';
 interface Props {
 	title: string;
 	description: string;
+	titleKey?: string;
+	descriptionKey?: string;
 	activeHref?: string;
 }
 
 const {
 	title,
 	description,
+	titleKey,
+	descriptionKey,
 	activeHref = '/login'
 } = Astro.props;
 ---
 
-<Layout title={title} description={description} bodyClass="theme-auth">
+<Layout title={title} description={description} titleKey={titleKey} descriptionKey={descriptionKey} bodyClass="theme-auth">
 	<div class="page-shell">
 		<AppNavbar mode="public" activeHref={activeHref} />
 

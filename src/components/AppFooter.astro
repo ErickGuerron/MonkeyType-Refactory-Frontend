@@ -14,7 +14,7 @@ const { mode = 'public' } = Astro.props;
 	<div class="container app-footer__inner">
 		<div>
 			<p class="app-footer__title">MonkeyType</p>
-			<p class="app-footer__copy">
+			<p class="app-footer__copy" data-i18n={mode === 'private' ? 'footer.privateCopy' : 'footer.publicCopy'}>
 				{mode === 'private'
 					? 'Typing minimalista en Astro, conectado a quotes, resultados y preferencias reales.'
 					: 'Una experiencia oscura, sobria y lista para entrar, practicar y ajustar tu espacio de escritura.'}
@@ -22,9 +22,9 @@ const { mode = 'public' } = Astro.props;
 		</div>
 
 		<div class="app-footer__links mono">
-			{mode === 'private' && <a href="/settings">Settings</a>}
-			<a href={docsUrl} target="_blank" rel="noreferrer">API docs</a>
-			<a href={healthUrl} target="_blank" rel="noreferrer">Health</a>
+			{mode === 'private' && <a href="/settings" data-i18n="footer.settings">Settings</a>}
+			<a href={docsUrl} target="_blank" rel="noreferrer" data-i18n="footer.apiDocs">API docs</a>
+			<a href={healthUrl} target="_blank" rel="noreferrer" data-i18n="footer.health">Health</a>
 		</div>
 	</div>
 </footer>

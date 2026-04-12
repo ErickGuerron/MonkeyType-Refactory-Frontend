@@ -5,18 +5,24 @@ import AuthLayout from '../../layouts/AuthLayout.astro';
 
 <AuthLayout
 	title="MonkeyType | Nueva contraseña"
-	description="Definí una nueva contraseña para tu cuenta."
+	titleKey="auth.resetConfirm.title"
+	description="Set a new password for your account."
+	descriptionKey="auth.resetConfirm.descriptionMeta"
 	activeHref="/reset-password"
 >
 	<AuthForm
 		mode="reset-confirm"
-		title="Elegí una nueva contraseña"
-		description="Usá el enlace que llegó por email para completar el cambio."
-		submitLabel="Guardar nueva contraseña"
-		note="Si el enlace expiró, pedí uno nuevo desde la pantalla de recuperación."
+		title="Choose a new password"
+		titleKey="auth.resetConfirm.heading"
+		description="Use the link from your email to complete the change."
+		descriptionKey="auth.resetConfirm.body"
+		submitLabel="Save new password"
+		submitLabelKey="auth.resetConfirm.submit"
+		note="If the link expired, request a new one from the recovery screen."
+		noteKey="auth.resetConfirm.note"
 		links={[
-			{ href: '/reset-password', label: 'Solicitar otro enlace' },
-			{ href: '/login', label: 'Volver a login' }
+			{ href: '/reset-password', label: 'auth.resetConfirm.requestAnother' },
+			{ href: '/login', label: 'auth.reset.backToLogin' }
 		]}
 	/>
 </AuthLayout>

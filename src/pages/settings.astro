@@ -2,48 +2,53 @@
 import PrivateLayout from '../layouts/PrivateLayout.astro';
 
 const modeOptions = [
-	{ value: 'time', label: 'Time (duración configurable)' },
-	{ value: 'quote', label: 'Quote completa' },
-	{ value: 'words', label: 'Words (50 / 100 / 150 en home)' },
-	{ value: 'zen', label: 'Zen (escritura libre)' },
-	{ value: 'custom', label: 'Custom' }
+	{ value: 'time', label: 'Time (configurable duration)', key: 'settings.mode.time' },
+	{ value: 'quote', label: 'Quote complete', key: 'settings.mode.quote' },
+	{ value: 'words', label: 'Words (50 / 100 / 150 on home)', key: 'settings.mode.words' },
+	{ value: 'zen', label: 'Zen (free writing)', key: 'settings.mode.zen' },
+	{ value: 'custom', label: 'Custom', key: 'settings.mode.custom' }
 ];
 
 const languageOptions = [
-	{ value: 'english', label: 'English' },
-	{ value: 'spanish', label: 'Español' }
+	{ value: 'english', label: 'English', key: 'settings.language.english' },
+	{ value: 'spanish', label: 'Spanish', key: 'settings.language.spanish' }
 ];
 
 const timeOptions = [
-	{ value: 30, label: '30 segundos' },
-	{ value: 60, label: '60 segundos' },
-	{ value: 120, label: '120 segundos' }
+	{ value: 30, label: '30 seconds', key: 'settings.time.30' },
+	{ value: 60, label: '60 seconds', key: 'settings.time.60' },
+	{ value: 120, label: '120 seconds', key: 'settings.time.120' }
 ];
 
 const themeOptions = [
-	{ value: 'system', label: 'System' },
-	{ value: 'dark', label: 'Dark' },
-	{ value: 'light', label: 'Light' }
+	{ value: 'system', label: 'System', key: 'settings.theme.system' },
+	{ value: 'dark', label: 'Dark', key: 'settings.theme.dark' },
+	{ value: 'light', label: 'Light', key: 'settings.theme.light' }
 ];
 ---
 
 <PrivateLayout
 	title="MonkeyType | Settings"
-	description="Configuración privada de MonkeyType conectada a preferencias reales del backend."
+	titleKey="settings.title"
+	description="Private MonkeyType settings connected to real backend preferences."
+	descriptionKey="settings.descriptionMeta"
 	activeHref="/settings"
 	pageEyebrow="Settings"
-	pageTitle="Ajustá la experiencia hasta que se sienta tuya."
-	pageDescription="La estructura visual sigue siendo profunda y ordenada, pero ahora theme, language, defaultMode, timeDuration, live WPM, punctuation, numbers y sound se leen y persisten contra la API real."
+	pageEyebrowKey="settings.pageEyebrow"
+	pageTitle="Tune the experience until it feels yours."
+	pageTitleKey="settings.pageTitle"
+	pageDescription="The visual structure stays deep and organized, but now theme, quote language, default mode, time duration, live WPM, punctuation, numbers, and sound are read from and persisted to the real API."
+	pageDescriptionKey="settings.pageDescription"
 >
 	<section class="settings-page" data-settings-page>
 		<article class="terminal-panel settings-profile">
 			<div>
-				<span class="eyebrow">Profile</span>
+				<span class="eyebrow" data-i18n="settings.profile">Profile</span>
 				<h2 data-settings-user-name>—</h2>
 				<p data-settings-user-email>—</p>
 			</div>
 			<div class="settings-profile__actions">
-				<button class="button-ghost" data-action="logout" type="button">Cerrar sesión</button>
+				<button class="button-ghost" data-action="logout" data-i18n="settings.logout" type="button">Log out</button>
 			</div>
 		</article>
 
@@ -52,40 +57,48 @@ const themeOptions = [
 		<form class="settings-grid" data-preferences-form>
 			<article class="terminal-panel settings-card settings-card--form">
 				<div class="settings-card__header">
-					<h3>Experience</h3>
-					<span>Core</span>
+					<h3 data-i18n="settings.experience">Experience</h3>
+					<span data-i18n="settings.core">Core</span>
 				</div>
-				<p>Lo esencial para que la home tipográfica llegue lista: tema, idioma y modo por defecto.</p>
+				<p data-i18n="settings.experienceBody">The essentials so the typing home arrives ready: theme, quote language, and default mode.</p>
 				<div class="settings-fields">
+					<label class="settings-field settings-field--wide">
+						<span data-i18n="settings.uiLanguage">UI language</span>
+						<select data-ui-locale-select aria-label="UI language selector" data-i18n-aria-label="settings.uiLanguageAria">
+							<option value="en" data-i18n-option="locale.en">English</option>
+							<option value="es" data-i18n-option="locale.es">Spanish</option>
+						</select>
+						<small data-i18n="settings.uiLanguageBody">Changes the language of the whole page interface without affecting the quote language.</small>
+					</label>
 					<label class="settings-field">
-						<span>Theme</span>
+						<span data-i18n="settings.theme">Theme</span>
 						<select name="theme">
 							{themeOptions.map((option) => (
-								<option value={option.value}>{option.label}</option>
+								<option value={option.value} data-i18n-option={option.key}>{option.label}</option>
 							))}
 						</select>
 					</label>
 					<label class="settings-field">
-						<span>Language</span>
+						<span data-i18n="settings.quoteLanguage">Quote language</span>
 						<select name="language">
 							{languageOptions.map((option) => (
-								<option value={option.value}>{option.label}</option>
+								<option value={option.value} data-i18n-option={option.key}>{option.label}</option>
 							))}
 						</select>
 					</label>
 					<label class="settings-field">
-						<span>Default mode</span>
+						<span data-i18n="settings.defaultMode">Default mode</span>
 						<select name="defaultMode">
 							{modeOptions.map((option) => (
-								<option value={option.value}>{option.label}</option>
+								<option value={option.value} data-i18n-option={option.key}>{option.label}</option>
 							))}
 						</select>
 					</label>
 					<label class="settings-field">
-						<span>Time duration</span>
+						<span data-i18n="settings.timeDuration">Time duration</span>
 						<select name="timeDuration">
 							{timeOptions.map((option) => (
-								<option value={option.value}>{option.label}</option>
+								<option value={option.value} data-i18n-option={option.key}>{option.label}</option>
 							))}
 						</select>
 					</label>
@@ -94,36 +107,36 @@ const themeOptions = [
 
 			<article class="terminal-panel settings-card settings-card--form">
 				<div class="settings-card__header">
-					<h3>Live feedback</h3>
-					<span>Runtime</span>
+					<h3 data-i18n="settings.liveFeedback">Live feedback</h3>
+					<span data-i18n="settings.runtime">Runtime</span>
 				</div>
-				<p>Controlá cuánta señal aparece mientras escribís y si querés audio mínimo para error/success.</p>
+				<p data-i18n="settings.liveFeedbackBody">Control how much signal appears while you type and whether you want subtle audio for error/success.</p>
 				<div class="settings-toggles">
 					<label class="settings-toggle">
 						<div>
-							<strong>Show live WPM</strong>
-							<p>Muestra u oculta la métrica viva en la pantalla principal.</p>
+							<strong data-i18n="settings.showLiveWpm">Show live WPM</strong>
+							<p data-i18n="settings.showLiveWpmBody">Show or hide the live metric on the main screen.</p>
 						</div>
 						<input name="showLiveWpm" type="checkbox" />
 					</label>
 					<label class="settings-toggle">
 						<div>
-							<strong>Punctuation enabled</strong>
-							<p>En words/time conserva signos; en quote se mantiene siempre el texto natural.</p>
+							<strong data-i18n="settings.punctuationEnabled">Punctuation enabled</strong>
+							<p data-i18n="settings.punctuationEnabledBody">In words/time it keeps punctuation; in quote it always preserves the natural text.</p>
 						</div>
 						<input name="punctuationEnabled" type="checkbox" />
 					</label>
 					<label class="settings-toggle">
 						<div>
-							<strong>Numbers enabled</strong>
-							<p>En words/time conserva números; apagado deriva el texto desde la quote original sin dígitos.</p>
+							<strong data-i18n="settings.numbersEnabled">Numbers enabled</strong>
+							<p data-i18n="settings.numbersEnabledBody">In words/time it keeps numbers; when off it derives text from the original quote without digits.</p>
 						</div>
 						<input name="numbersEnabled" type="checkbox" />
 					</label>
 					<label class="settings-toggle">
 						<div>
-							<strong>Sound enabled</strong>
-							<p>Activa tonos sutiles para errores y finalización del test.</p>
+							<strong data-i18n="settings.soundEnabled">Sound enabled</strong>
+							<p data-i18n="settings.soundEnabledBody">Enable subtle tones for errors and test completion.</p>
 						</div>
 						<input name="soundEnabled" type="checkbox" />
 					</label>
@@ -132,33 +145,33 @@ const themeOptions = [
 
 			<article class="terminal-panel settings-card">
 				<div class="settings-card__header">
-					<h3>Preview</h3>
-					<span>Now</span>
+					<h3 data-i18n="settings.preview">Preview</h3>
+					<span data-i18n="settings.now">Now</span>
 				</div>
 				<p data-settings-summary>Theme system • english • time 30s • live WPM on • punctuation off • numbers off • sound off</p>
 				<ul class="settings-bullets">
-					<li><span>La home usa language + defaultMode + timeDuration para elegir quote, duración base o armar words 50/100/150.</span></li>
-					<li><span>Words y time derivan el texto desde la quote original aplicando filtros de punctuation y numbers.</span></li>
-					<li><span>Theme se aplica en caliente sobre el layout actual.</span></li>
-					<li><span>Zen guarda stats/resultados, pero no persiste el texto libre como quote en Mongo.</span></li>
-					<li><span>Los cambios se guardan con PATCH real a <code>/api/users/me/preferences</code>.</span></li>
+					<li><span data-i18n="settings.previewBullet1">Home uses quote language + default mode + time duration to choose a quote, base duration, or build words 50/100/150.</span></li>
+					<li><span data-i18n="settings.previewBullet2">Words and time derive the text from the original quote applying punctuation and numbers filters.</span></li>
+					<li><span data-i18n="settings.previewBullet3">Theme is applied live on the current layout.</span></li>
+					<li><span data-i18n="settings.previewBullet4">Zen stores stats/results, but does not persist free text as a quote in Mongo.</span></li>
+					<li><span data-i18n="settings.previewBullet5">Changes are saved with a real PATCH to /api/users/me/preferences.</span></li>
 				</ul>
 			</article>
 
 			<article class="terminal-panel settings-card is-danger">
 				<div class="settings-card__header">
-					<h3>Danger zone</h3>
-					<span>Session</span>
+					<h3 data-i18n="settings.dangerTitle">Danger zone</h3>
+					<span data-i18n="settings.session">Session</span>
 				</div>
-				<p>Mantenemos una zona sensible, pero sin humo: podés descartar cambios locales o cerrar sesión del dispositivo actual.</p>
+				<p data-i18n="settings.dangerBody">We keep a sensitive zone, but without smoke: you can discard local changes or log out from the current device.</p>
 				<div class="settings-actions">
-					<button class="button-secondary" data-action="reset-form" type="button">Descartar cambios</button>
-					<button class="button-ghost" data-action="logout" type="button">Cerrar sesión</button>
+					<button class="button-secondary" data-action="reset-form" data-i18n="settings.discardChanges" type="button">Discard changes</button>
+					<button class="button-ghost" data-action="logout" data-i18n="settings.logout" type="button">Log out</button>
 				</div>
 			</article>
 
 			<div class="settings-submit">
-				<button class="button-primary" data-action="save-preferences" type="submit">Guardar preferencias</button>
+				<button class="button-primary" data-action="save-preferences" data-i18n="settings.savePreferences" type="submit">Save preferences</button>
 			</div>
 		</form>
 	</section>
@@ -248,6 +261,10 @@ const themeOptions = [
 		gap: 0.45rem;
 	}
 
+	.settings-field--wide {
+		grid-column: 1 / -1;
+	}
+
 	.settings-field span,
 	.settings-toggle strong {
 		font-family: var(--font-mono);
@@ -279,6 +296,12 @@ const themeOptions = [
 	.settings-field select option {
 		background: var(--surface-elevated);
 		color: var(--text);
+	}
+
+	.settings-field small {
+		color: var(--text-dim);
+		font-size: 0.82rem;
+		line-height: 1.45;
 	}
 
 	.settings-toggle {

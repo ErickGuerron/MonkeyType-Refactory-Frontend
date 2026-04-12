@@ -1,4 +1,5 @@
 import Swal, { type SweetAlertIcon, type SweetAlertOptions } from 'sweetalert2';
+import { t } from './i18n';
 
 const baseCustomClass = {
 	popup: 'monkey-swal',
@@ -14,7 +15,7 @@ function createOptions(options: SweetAlertOptions): SweetAlertOptions {
 	return {
 		background: '#181818',
 		color: '#f7f1dd',
-		confirmButtonText: 'Entendido',
+		confirmButtonText: t('alerts.ok'),
 		buttonsStyling: false,
 		customClass: baseCustomClass,
 		...options
@@ -55,11 +56,11 @@ export function showSuccessAlert(title: string, text: string) {
 }
 
 export function showWarningAlert(title: string, text: string) {
-	return showAlert({ icon: 'warning', title, text, confirmButtonText: 'Ok' });
+	return showAlert({ icon: 'warning', title, text, confirmButtonText: t('alerts.okShort') });
 }
 
-export function showErrorAlert(message: string, title = 'No se pudo completar la acción') {
-	return showAlert({ icon: 'error', title, text: message, confirmButtonText: 'Reintentar' });
+export function showErrorAlert(message: string, title = t('alerts.errorTitle')) {
+	return showAlert({ icon: 'error', title, text: message, confirmButtonText: t('alerts.retry') });
 }
 
 export function closeAlert() {

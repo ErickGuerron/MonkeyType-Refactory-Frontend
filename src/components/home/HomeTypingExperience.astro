@@ -3,86 +3,92 @@
 
   <section
     class="typing-config terminal-panel"
-    aria-label="Configuración rápida"
+    aria-label="Quick configuration"
+    data-i18n-aria-label="home.quickConfigAria"
   >
     <div class="typing-config__group">
-      <span class="typing-config__label">mode</span>
+      <span class="typing-config__label" data-i18n="home.mode">mode</span>
       <div class="typing-config__chips">
         <label class="typing-config__select-shell typing-config__select-shell--chip">
-          <select class="typing-config__select typing-config__select--chip" data-pref-select="timeMode" aria-label="Seleccionar modo tiempo">
-            <option value="30">time 30</option>
-            <option value="60">time 60</option>
-            <option value="120">time 120</option>
+          <select class="typing-config__select typing-config__select--chip" data-pref-select="timeMode" aria-label="Select time mode" data-i18n-aria-label="home.selectTimeModeAria">
+            <option value="30" data-i18n-option="home.mode.time30">time 30</option>
+            <option value="60" data-i18n-option="home.mode.time60">time 60</option>
+            <option value="120" data-i18n-option="home.mode.time120">time 120</option>
           </select>
         </label>
         <button
           class="typing-chip"
           data-pref-key="defaultMode"
           data-pref-value="quote"
+          data-i18n="home.mode.quote"
           type="button">quote</button
         >
         <label class="typing-config__select-shell typing-config__select-shell--chip">
-          <select class="typing-config__select typing-config__select--chip" data-pref-select="wordsMode" aria-label="Seleccionar modo words">
-            <option value="50">words 50</option>
-            <option value="100">words 100</option>
-            <option value="150">words 150</option>
+          <select class="typing-config__select typing-config__select--chip" data-pref-select="wordsMode" aria-label="Select words mode" data-i18n-aria-label="home.selectWordsModeAria">
+            <option value="50" data-i18n-option="home.mode.words50">words 50</option>
+            <option value="100" data-i18n-option="home.mode.words100">words 100</option>
+            <option value="150" data-i18n-option="home.mode.words150">words 150</option>
           </select>
         </label>
         <button
           class="typing-chip"
           data-pref-key="defaultMode"
           data-pref-value="zen"
+          data-i18n="home.mode.zen"
           type="button">zen</button
         >
       </div>
     </div>
 
     <div class="typing-config__group">
-      <span class="typing-config__label">language</span>
+      <span class="typing-config__label" data-i18n="home.quoteLanguage">quote language</span>
       <label class="typing-config__select-shell">
-        <select class="typing-config__select" data-pref-select="language" aria-label="Seleccionar idioma">
-          <option value="english">english</option>
-          <option value="spanish">español</option>
+        <select class="typing-config__select" data-pref-select="language" aria-label="Select quote language" data-i18n-aria-label="home.selectQuoteLanguageAria">
+          <option value="english" data-i18n-option="settings.language.english">english</option>
+          <option value="spanish" data-i18n-option="settings.language.spanish">spanish</option>
         </select>
       </label>
     </div>
 
     <div class="typing-config__group is-utility">
-      <span class="typing-config__label">signals</span>
+      <span class="typing-config__label" data-i18n="home.signals">signals</span>
       <div class="typing-config__chips">
         <button
           class="typing-chip"
           data-pref-key="showLiveWpm"
           data-pref-toggle="true"
+          data-i18n="home.liveWpm"
           type="button">live wpm</button
         >
         <button
           class="typing-chip"
           data-pref-key="punctuationEnabled"
           data-pref-toggle="true"
+          data-i18n="home.punctuation"
           type="button">punctuation</button
         >
         <button
           class="typing-chip"
           data-pref-key="numbersEnabled"
           data-pref-toggle="true"
+          data-i18n="home.numbers"
           type="button">numbers</button
         >
         <button
           class="typing-chip"
           data-pref-key="soundEnabled"
           data-pref-toggle="true"
+          data-i18n="home.sound"
           type="button">sound</button
         >
-        <a class="typing-chip typing-chip--link" href="/settings">settings</a>
       </div>
     </div>
   </section>
 
-  <section class="typing-stage" aria-label="Typing test principal">
+  <section class="typing-stage" aria-label="Main typing test" data-i18n-aria-label="home.typingStageAria">
     <header class="typing-stage__hud">
       <div>
-        <p class="typing-stage__timer-label">time</p>
+        <p class="typing-stage__timer-label" data-i18n="home.time">time</p>
         <strong class="typing-stage__timer" data-stat="timer">30s</strong>
       </div>
 
@@ -90,7 +96,7 @@
         <span class="typing-inline-stat" data-current-mode>time 30s</span>
         <span class="typing-inline-stat" data-current-language>english</span>
         <span class="typing-inline-stat" data-live-wpm-card>
-          live
+          <span data-i18n="home.live">live</span>
           <strong data-stat="wpm">0</strong>
         </span>
       </div>
@@ -103,7 +109,8 @@
       <label
         class="typing-stage__surface"
         data-quote-surface
-        aria-label="Entrada principal de typing"
+        aria-label="Main typing input"
+        data-i18n-aria-label="home.typingSurfaceAria"
       >
         <div class="typing-stage__panning" data-typing-panning>
           <div
@@ -125,8 +132,9 @@
       </label>
     </div>
 
-    <div class="typing-stage__input-shell" aria-label="Ayuda visual de typing">
+    <div class="typing-stage__input-shell" aria-label="Typing helper" data-i18n-aria-label="home.typingHelpAria">
       <span class="typing-stage__input-hint mono" data-typing-hint
+        data-i18n="home.typingHint"
         >type directly over the quote and keep your focus in the line</span
       >
     </div>
@@ -134,26 +142,26 @@
     <footer class="typing-stage__footer">
       <div class="typing-stage__stats">
         <div class="typing-stage__stat">
-          <span>raw</span>
+          <span data-i18n="home.raw">raw</span>
           <strong data-stat="raw">0</strong>
         </div>
         <div class="typing-stage__stat">
-          <span>acc</span>
+          <span data-i18n="home.acc">acc</span>
           <strong data-stat="accuracy">100%</strong>
         </div>
       </div>
 
       <div class="typing-stage__actions">
-        <button class="typing-action" data-action="restart" type="button"
+        <button class="typing-action" data-action="restart" data-i18n="home.restart" type="button"
           >restart</button
         >
-        <button class="typing-action" data-action="next-quote" type="button"
+        <button class="typing-action" data-action="next-quote" data-i18n="home.next" type="button"
           >next</button
         >
-        <button class="typing-action" data-action="focus-input" type="button"
+        <button class="typing-action" data-action="focus-input" data-i18n="home.focus" type="button"
           >focus</button
         >
-        <button class="typing-action" data-action="finish-zen" type="button" hidden
+        <button class="typing-action" data-action="finish-zen" data-i18n="home.finishZen" type="button" hidden
           >finish zen</button
         >
       </div>
@@ -164,8 +172,8 @@
       <div class="typing-result terminal-panel" role="dialog" aria-modal="true" aria-labelledby="typing-result-title">
         <div class="typing-result__header">
           <div>
-            <p class="typing-result__eyebrow">test completed</p>
-            <h2 id="typing-result-title" data-result-title>Resultado guardado</h2>
+            <p class="typing-result__eyebrow" data-i18n="home.resultEyebrow">test completed</p>
+            <h2 id="typing-result-title" data-result-title>Result saved</h2>
           </div>
           <p data-result-summary></p>
         </div>
@@ -173,54 +181,54 @@
         <div class="typing-result__body">
           <aside class="typing-result__hero-metrics">
             <article class="typing-result__hero-block">
-              <span>wpm</span>
+              <span data-i18n="home.wpm">wpm</span>
               <strong data-result-metric="wpm">0</strong>
             </article>
             <article class="typing-result__hero-block">
-              <span>acc</span>
+              <span data-i18n="home.acc">acc</span>
               <strong data-result-metric="accuracy">100%</strong>
             </article>
           </aside>
 
           <div class="typing-result__graph-shell">
             <div class="typing-result__graph-head">
-              <span>run graph</span>
+              <span data-i18n="home.runGraph">run graph</span>
               <strong data-result-chart-value>100%</strong>
             </div>
             <div class="typing-result__graph" data-result-chart-shell>
-              <canvas data-result-chart aria-label="Gráfico del resultado"></canvas>
+              <canvas data-result-chart aria-label="Result chart" data-i18n-aria-label="home.resultChartAria"></canvas>
             </div>
             <div class="typing-result__legend">
-              <span><i class="is-wpm"></i>wpm</span>
-              <span><i class="is-raw"></i>raw</span>
-              <span><i class="is-burst"></i>burst</span>
-              <span><i class="is-errors"></i>errors</span>
+              <span><i class="is-wpm"></i><span data-i18n="home.wpm">wpm</span></span>
+              <span><i class="is-raw"></i><span data-i18n="home.raw">raw</span></span>
+              <span><i class="is-burst"></i><span data-i18n="home.burst">burst</span></span>
+              <span><i class="is-errors"></i><span data-i18n="home.errors">errors</span></span>
             </div>
           </div>
         </div>
 
         <div class="typing-result__summary-grid">
           <article class="typing-result__summary-item">
-            <span>raw</span>
+            <span data-i18n="home.raw">raw</span>
             <strong data-result-metric="raw">0</strong>
           </article>
           <article class="typing-result__summary-item">
-            <span>time</span>
+            <span data-i18n="home.time">time</span>
             <strong data-result-metric="time">30s</strong>
           </article>
           <article class="typing-result__summary-item">
-            <span>mode</span>
+            <span data-i18n="home.mode">mode</span>
             <strong data-result-meta="mode">time 30</strong>
           </article>
           <article class="typing-result__summary-item">
-            <span>language</span>
+            <span data-i18n="home.language">language</span>
             <strong data-result-meta="language">english</strong>
           </article>
         </div>
 
         <div class="typing-result__actions">
-          <button class="button-secondary" data-action="close-result" type="button">cerrar</button>
-          <button class="button-primary" data-action="next-quote" type="button">siguiente test</button>
+          <button class="button-secondary" data-action="close-result" data-i18n="home.close" type="button">close</button>
+          <button class="button-primary" data-action="next-quote" data-i18n="home.nextTest" type="button">next test</button>
         </div>
       </div>
     </section>
@@ -230,37 +238,34 @@
     <article class="typing-rail__card terminal-panel">
       <div class="typing-rail__header">
         <div>
-          <p class="typing-rail__eyebrow">profile</p>
+          <p class="typing-rail__eyebrow" data-i18n="home.profile">profile</p>
           <h3 data-home-user-name>—</h3>
           <p data-home-user-email>—</p>
         </div>
-        <button class="typing-action" data-action="logout" type="button"
+        <button class="typing-action" data-action="logout" data-i18n="home.logout" type="button"
           >logout</button
         >
       </div>
-      <p class="typing-rail__copy">
-        La home vuelve a poner la escritura al centro, pero mantiene quotes,
-        resultados y preferencias conectados al backend actual.
-      </p>
+      <p class="typing-rail__copy" data-i18n="home.railCopy">The home puts writing back at the center while keeping quotes, results, and preferences connected to the current backend.</p>
     </article>
 
     <article class="typing-rail__card terminal-panel">
       <div class="typing-rail__header is-compact">
         <div>
-          <p class="typing-rail__eyebrow">recent results</p>
-          <h3>historial</h3>
+          <p class="typing-rail__eyebrow" data-i18n="home.recentResults">recent results</p>
+          <h3 data-i18n="home.history">history</h3>
         </div>
-        <a class="typing-inline-link" href="/settings">preferencias</a>
+        <a class="typing-inline-link" href="/settings" data-i18n="home.preferences">preferences</a>
       </div>
       <ul class="typing-history" data-history-list></ul>
     </article>
   </section>
 
-  <footer class="typing-shortcuts" aria-label="Atajos visuales">
-    <span><kbd>esc</kbd> restart</span>
-    <span><kbd>tab</kbd> focus input</span>
-    <span><kbd>enter</kbd> next test after result</span>
-    <span><kbd>ctrl</kbd> + <kbd>enter</kbd> finish zen</span>
+  <footer class="typing-shortcuts" aria-label="Visual shortcuts" data-i18n-aria-label="home.shortcutsAria">
+    <span><kbd>esc</kbd> <span data-i18n="home.shortcutRestart">restart</span></span>
+    <span><kbd>tab</kbd> <span data-i18n="home.shortcutFocus">focus input</span></span>
+    <span><kbd>enter</kbd> <span data-i18n="home.shortcutNext">next test after result</span></span>
+    <span><kbd>ctrl</kbd> + <kbd>enter</kbd> <span data-i18n="home.shortcutFinishZen">finish zen</span></span>
   </footer>
 </section>
 
@@ -272,10 +277,11 @@
 
   .typing-config {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(15rem, 1fr));
     gap: 0.85rem;
     padding: 0.7rem 0.9rem;
     border-radius: 18px;
+    align-items: start;
   }
 
   .typing-config__group {
@@ -283,9 +289,9 @@
     gap: 0.55rem;
   }
 
-  .typing-config__group.is-utility {
-    justify-self: end;
-  }
+ 	.typing-config__group.is-utility {
+		justify-self: stretch;
+	}
 
   .typing-config__label,
   .typing-config__micro-label,
@@ -310,6 +316,7 @@
 		display: flex;
 		flex-wrap: wrap;
 		gap: 0.35rem;
+		align-items: stretch;
 	}
 
 	.typing-config__select-shell {
@@ -318,7 +325,9 @@
 	}
 
 	.typing-config__select-shell--chip {
-		min-width: fit-content;
+		flex: 1 1 7.25rem;
+		min-width: 0;
+		max-width: 10rem;
 	}
 
 	.typing-config__select-shell::after {
@@ -351,7 +360,8 @@
 	}
 
 	.typing-config__select--chip {
-		min-width: 6.2rem;
+		min-width: 0;
+		width: 100%;
 		background: color-mix(in srgb, var(--text) 3%, transparent);
 		color: var(--text-dim);
 	}
@@ -376,8 +386,10 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    flex: 0 1 auto;
     min-height: 1.7rem;
     padding: 0.28rem 0.62rem;
+    max-width: 100%;
     border: 0;
     border-radius: 12px;
     background: color-mix(in srgb, var(--text) 3%, transparent);
@@ -420,7 +432,6 @@
     padding: clamp(1.1rem, 2.5vw, 1.6rem) clamp(0.85rem, 3vw, 2rem);
   }
 
-  .typing-stage__hud,
   .typing-stage__footer,
   .typing-result__header,
   .typing-result__actions,
@@ -431,6 +442,13 @@
     gap: 1rem;
   }
 
+	.typing-stage__hud {
+		display: grid;
+		grid-template-columns: minmax(0, max-content) minmax(0, 1fr);
+		align-items: start;
+		gap: 0.75rem 1rem;
+	}
+
   .typing-stage__timer {
     display: block;
     font-family: var(--font-display);
@@ -440,8 +458,11 @@
   }
 
   .typing-stage__summary {
+		display: flex;
     flex-wrap: wrap;
     justify-content: flex-end;
+    justify-self: end;
+    align-self: start;
     gap: 0.45rem;
   }
 
@@ -457,7 +478,7 @@
     padding: 0.3rem 0.62rem;
     min-height: 1.7rem;
     min-width: fit-content;
-    border-radius: 12px;
+    border-radius: 14px;
     border: 0;
     background: color-mix(in srgb, var(--text) 4%, transparent);
     color: var(--text-muted);
@@ -467,7 +488,18 @@
     letter-spacing: 0.06em;
     text-transform: lowercase;
     white-space: nowrap;
+		max-width: 100%;
   }
+
+	.typing-inline-stat {
+		min-height: 2.1rem;
+		padding: 0.42rem 0.8rem;
+		border: 1px solid color-mix(in srgb, var(--accent) 14%, transparent);
+		border-radius: 16px;
+		background: color-mix(in srgb, var(--text) 3%, transparent);
+		color: var(--text-dim);
+		box-shadow: inset 0 1px 0 color-mix(in srgb, white 4%, transparent);
+	}
 
   .typing-inline-stat strong {
     font-size: 0.82rem;
@@ -959,6 +991,19 @@
       grid-template-columns: 1fr;
     }
 
+		.typing-stage__hud,
+		.typing-stage__footer {
+			flex-wrap: wrap;
+		}
+
+		.typing-stage__hud {
+			grid-template-columns: minmax(0, max-content) minmax(0, 1fr);
+		}
+
+		.typing-stage__summary {
+			justify-content: flex-start;
+		}
+
 		.typing-result__body,
 		.typing-result__summary-grid {
 			grid-template-columns: 1fr;
@@ -974,11 +1019,15 @@
   }
 
   @media (max-width: 720px) {
+		.typing-config__select-shell--chip {
+			max-width: none;
+			flex-basis: calc(50% - 0.2rem);
+		}
+
     .typing-stage {
       min-height: auto;
     }
 
-    .typing-stage__hud,
     .typing-stage__footer,
     .typing-result__header,
     .typing-result__actions,
@@ -987,16 +1036,21 @@
       flex-direction: column;
     }
 
-    .typing-stage__hud {
-      align-items: flex-start;
-    }
-
     .typing-stage__summary {
       flex-direction: row;
       flex-wrap: wrap;
       justify-content: flex-start;
       align-items: center;
+			justify-self: start;
     }
+
+		.typing-chip,
+		.typing-inline-stat,
+		.typing-inline-link,
+		.typing-action {
+			white-space: normal;
+			text-align: center;
+		}
 
     .typing-stage__stats,
     .typing-stage__actions {
@@ -1019,4 +1073,14 @@
 			grid-template-columns: repeat(2, minmax(0, 1fr));
 		}
     }
+
+	@media (max-width: 420px) {
+		.typing-config__select-shell--chip {
+			flex-basis: 100%;
+		}
+
+		.typing-config__chips {
+			width: 100%;
+		}
+	}
 </style>

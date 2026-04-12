@@ -5,12 +5,16 @@ interface Props {
 	title?: string;
 	description?: string;
 	bodyClass?: string;
+	titleKey?: string;
+	descriptionKey?: string;
 }
 
 const {
 	title = 'MonkeyType',
 	description = 'MonkeyType typing experience con acceso a cuenta y configuración.',
-	bodyClass = ''
+	bodyClass = '',
+	titleKey,
+	descriptionKey
 } = Astro.props;
 ---
 
@@ -22,33 +26,57 @@ const {
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<link rel="icon" href="/favicon.ico" />
 		<meta name="generator" content={Astro.generator} />
-		<meta name="description" content={description} />
-		<title>{title}</title>
+		<meta name="description" content={description} data-i18n-meta-description={descriptionKey} />
+		<title data-i18n-document-title={titleKey}>{title}</title>
 		<script is:inline>
 			(() => {
 				const storageKey = 'monkeytype.theme-preference';
+				const localeStorageKey = 'monkeytype.ui-locale';
 				const root = document.documentElement;
 				const resolveSystemTheme = () =>
 					window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+				const normalizeLocale = (value) => {
+					const normalized = String(value || '').toLowerCase();
+					if (normalized.startsWith('es')) return 'es';
+					if (normalized.startsWith('en')) return 'en';
+					return 'en';
+				};
 
 				try {
 					const storedPreference = window.localStorage.getItem(storageKey);
+					const storedLocale = window.localStorage.getItem(localeStorageKey);
 					const preference =
 						storedPreference === 'light' || storedPreference === 'dark' || storedPreference === 'system'
 							? storedPreference
 							: 'system';
+					const locale = normalizeLocale(storedLocale || navigator.language || navigator.languages?.[0]);
 					const resolvedTheme = preference === 'system' ? resolveSystemTheme() : preference;
 
+					root.dataset.i18nReady = 'false';
+					root.dataset.uiLocale = locale;
+					root.lang = locale;
 					root.dataset.themePreference = preference;
 					root.dataset.userTheme = resolvedTheme;
 				} catch {
+					root.dataset.i18nReady = 'false';
+					root.dataset.uiLocale = 'en';
+					root.lang = 'en';
 					root.dataset.themePreference = 'system';
 					root.dataset.userTheme = resolveSystemTheme();
 				}
+
+				window.setTimeout(() => {
+					if (root.dataset.i18nReady !== 'true') {
+						root.dataset.i18nReady = 'true';
+					}
+				}, 1500);
 			})();
 		</script>
 	</head>
 	<body class={bodyClass}>
 		<slot />
+		<script>
+			import '../scripts/i18n-client';
+		</script>
 	</body>
 </html>

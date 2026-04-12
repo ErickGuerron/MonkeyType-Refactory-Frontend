@@ -2,9 +2,9 @@
 import Layout from '../layouts/Layout.astro';
 ---
 
-<Layout title="MonkeyType | Redirecting" description="Redirección interna a la nueva ruta privada principal.">
+<Layout title="MonkeyType | Redirecting" titleKey="app.redirectTitle" description="Internal redirect to the new main private route." descriptionKey="app.redirectDescription">
 	<div class="redirect-page">
-		<p>Redirigiendo a tu nuevo home privado...</p>
+		<p data-i18n="app.redirectBody">Redirecting to your new private home...</p>
 	</div>
 
 	<script>
