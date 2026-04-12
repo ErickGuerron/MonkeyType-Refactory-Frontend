@@ -50,16 +50,19 @@
 		<div class="typing-stage__center">
 			<p class="typing-stage__source mono" data-quote-source>Quote backend • English</p>
 			<label class="typing-stage__surface" data-quote-surface aria-label="Entrada principal de typing">
-				<div class="typing-stage__quote" data-action="focus-input" data-quote-text></div>
-				<textarea
-					class="typing-stage__overlay-input"
-					data-typing-input
-					spellcheck="false"
-					autocomplete="off"
-					autocorrect="off"
-					autocapitalize="off"
-					placeholder=""
-				></textarea>
+				<div class="typing-stage__panning" data-typing-panning>
+					<div class="typing-stage__quote" data-action="focus-input" data-quote-text></div>
+					<textarea
+						class="typing-stage__overlay-input"
+						data-typing-input
+						spellcheck="false"
+						autocomplete="off"
+						autocorrect="off"
+						autocapitalize="off"
+						placeholder=""
+					></textarea>
+					<div class="typing-stage__caret" data-typing-caret></div>
+				</div>
 			</label>
 		</div>
 
@@ -215,11 +218,11 @@
 	.typing-chip.is-active,
 	.typing-chip--link:hover {
 		color: var(--accent);
-		background: rgba(255, 255, 255, 0.04);
+		background: color-mix(in srgb, var(--text) 5%, transparent);
 	}
 
 	.typing-chip.is-active {
-		background: rgba(224, 193, 109, 0.08);
+		background: color-mix(in srgb, var(--accent) 10%, transparent);
 	}
 
 	.typing-stage {
@@ -266,7 +269,7 @@
 		padding: 0.55rem 0.8rem;
 		border-radius: 999px;
 		border: 0;
-		background: rgba(255, 255, 255, 0.03);
+		background: color-mix(in srgb, var(--text) 4%, transparent);
 		color: var(--text-muted);
 		font-family: var(--font-mono);
 		font-size: 0.75rem;
@@ -287,7 +290,7 @@
 	.typing-action:hover,
 	.typing-inline-link:hover {
 		color: var(--accent);
-		background: rgba(255, 255, 255, 0.05);
+		background: color-mix(in srgb, var(--text) 7%, transparent);
 		transform: translateY(-1px);
 	}
 
@@ -310,21 +313,44 @@
 		text-align: left;
 	}
 
+	.typing-stage__panning {
+		position: relative;
+		width: 100%;
+		transition: transform 120ms cubic-bezier(0.25, 0.8, 0.25, 1);
+	}
+
+	.typing-stage__caret {
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 3px;
+		background: var(--accent);
+		border-radius: 4px;
+		transition: transform 120ms cubic-bezier(0.25, 0.8, 0.25, 1);
+		z-index: 3;
+		pointer-events: none;
+		animation: caret-blink 1.2s infinite;
+		/* Default height, overridden by JS if character height available */
+		height: clamp(1.4rem, 2.5vw, 1.8rem);
+	}
+
+	@keyframes caret-blink {
+		0%, 100% { opacity: 1; }
+		50% { opacity: 0; }
+	}
+
 	.typing-stage__quote {
 		position: relative;
 		z-index: 1;
-		max-width: 72ch;
-		margin: 0 auto;
 		width: 100%;
 		font-family: var(--font-body);
-		font-size: clamp(1.45rem, 2.7vw, 2.2rem);
+		font-size: clamp(1.4rem, 2.5vw, 1.8rem);
 		line-height: 1.7;
 		letter-spacing: -0.02em;
 		color: color-mix(in srgb, var(--text) 32%, transparent);
 		white-space: pre-wrap;
 		text-align: left;
 		overflow-wrap: break-word;
-		transition: transform 120ms ease;
 	}
 
 	.typing-stage__surface {
@@ -332,10 +358,9 @@
 		display: block;
 		width: min(100%, 72ch);
 		margin: 0 auto;
-		height: 13.6rem;
 		overflow: hidden;
-		padding: 0.35rem 0;
 		cursor: text;
+		border-radius: 4px;
 	}
 
 	:global(.typing-char) {
@@ -354,12 +379,12 @@
 
 	:global(.typing-char.is-wrong) {
 		color: var(--danger);
-		background: rgba(255, 107, 77, 0.14);
+		background: color-mix(in srgb, var(--danger) 16%, transparent);
 	}
 
 	:global(.typing-char.is-current) {
 		color: var(--accent-strong);
-		background: rgba(224, 193, 109, 0.12);
+		background: color-mix(in srgb, var(--accent) 18%, transparent);
 	}
 
 	.typing-stage__input-shell {
@@ -384,9 +409,10 @@
 		border: 0;
 		background: transparent;
 		color: transparent;
-		caret-color: var(--accent);
+		caret-color: transparent;
+		overflow: hidden;
 		font-family: var(--font-body);
-		font-size: clamp(1.45rem, 2.7vw, 2.2rem);
+		font-size: clamp(1.4rem, 2.5vw, 1.8rem);
 		line-height: 1.7;
 		letter-spacing: -0.02em;
 		resize: none;
@@ -439,7 +465,7 @@
 	.typing-result {
 		padding: 1.2rem 1.3rem;
 		border-radius: 24px;
-		background: linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.015));
+		background: linear-gradient(180deg, color-mix(in srgb, var(--text) 4%, transparent), color-mix(in srgb, var(--text) 1%, transparent));
 	}
 
 	.typing-result h2,
@@ -495,7 +521,7 @@
 	.typing-history li {
 		padding: 0.9rem 0.95rem;
 		border-radius: 18px;
-		background: rgba(255, 255, 255, 0.03);
+		background: color-mix(in srgb, var(--text) 4%, transparent);
 	}
 
 	.typing-history li strong {
@@ -522,7 +548,7 @@
 	.typing-shortcuts kbd {
 		padding: 0.28rem 0.5rem;
 		border-radius: 999px;
-		background: rgba(255, 255, 255, 0.04);
+		background: color-mix(in srgb, var(--text) 5%, transparent);
 		color: var(--accent);
 		font: inherit;
 	}

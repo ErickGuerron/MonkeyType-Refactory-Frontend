@@ -243,6 +243,8 @@ export function initHomePage() {
 	const quoteSource = page.querySelector<HTMLElement>('[data-quote-source]');
 	const textArea = page.querySelector<HTMLTextAreaElement>('[data-typing-input]');
 	const quoteSurface = page.querySelector<HTMLElement>('[data-quote-surface]');
+	const panning = page.querySelector<HTMLElement>('[data-typing-panning]');
+	const caret = page.querySelector<HTMLElement>('[data-typing-caret]');
 	const userName = page.querySelector<HTMLElement>('[data-home-user-name]');
 	const userEmail = page.querySelector<HTMLElement>('[data-home-user-email]');
 	const logoutButton = page.querySelector<HTMLButtonElement>('[data-action="logout"]');
@@ -266,7 +268,7 @@ export function initHomePage() {
 	const nextQuoteButtons = Array.from(page.querySelectorAll<HTMLButtonElement>('[data-action="next-quote"]'));
 	const focusButtons = Array.from(page.querySelectorAll<HTMLElement>('[data-action="focus-input"]'));
 
-	if (!quoteText || !quoteSource || !textArea || !quoteSurface || !historyList || !resultCard || !resultTitle || !resultSummary || !resultMetricWpm || !resultMetricRaw || !resultMetricAccuracy || !resultMetricTime || !statWpm || !statRaw || !statAccuracy || !statTimer || !statMode || !statLanguage || restartButtons.length === 0 || nextQuoteButtons.length === 0 || focusButtons.length === 0 || !liveWpmCard) {
+	if (!quoteText || !quoteSource || !textArea || !quoteSurface || !panning || !caret || !historyList || !resultCard || !resultTitle || !resultSummary || !resultMetricWpm || !resultMetricRaw || !resultMetricAccuracy || !resultMetricTime || !statWpm || !statRaw || !statAccuracy || !statTimer || !statMode || !statLanguage || restartButtons.length === 0 || nextQuoteButtons.length === 0 || focusButtons.length === 0 || !liveWpmCard) {
 		return;
 	}
 
@@ -317,7 +319,8 @@ export function initHomePage() {
 		const characters = Array.from(quoteText.querySelectorAll<HTMLElement>('.typing-char'));
 
 		if (characters.length === 0) {
-			quoteText.style.transform = 'translateY(0px)';
+			panning.style.transform = 'translateY(0px)';
+			caret.style.transform = 'translate(0px, 0px)';
 			textArea.scrollTop = 0;
 			quoteSurface.style.height = '';
 			return;
@@ -343,18 +346,32 @@ export function initHomePage() {
 		const computedLineHeight = Number.parseFloat(window.getComputedStyle(quoteText).lineHeight);
 		const fallbackHeight = characters[0]?.getBoundingClientRect().height || 0;
 		const lineHeight = Number.isFinite(computedLineHeight) ? computedLineHeight : fallbackHeight;
-		const visibleLines = 4;
+		const visibleLines = 3;
 		const viewportHeight = lineHeight * visibleLines;
 		const inputIndex = Math.min(textArea.value.length, Math.max(characters.length - 1, 0));
 		const activeLine = charLineIndexes[inputIndex] ?? 0;
 		const maxStartLine = Math.max(lineTops.length - visibleLines, 0);
-		const startLine = Math.min(activeLine, maxStartLine);
+		const startLine = Math.min(Math.max(activeLine - 1, 0), maxStartLine);
 		const offset = lineTops[startLine] ?? 0;
 
 		quoteSurface.style.height = `${viewportHeight}px`;
-		quoteText.style.transform = `translateY(${-offset}px)`;
-		textArea.style.height = `${Math.max(characters[characters.length - 1]?.offsetTop + lineHeight, viewportHeight)}px`;
-		textArea.scrollTop = offset;
+		panning.style.transform = `translateY(${-offset}px)`;
+
+		const activeChar = characters[inputIndex];
+		if (activeChar) {
+			let caretX = activeChar.offsetLeft;
+			const caretY = activeChar.offsetTop;
+			
+			if (textArea.value.length >= characters.length) {
+				caretX += activeChar.offsetWidth;
+			}
+			
+			caret.style.height = `${activeChar.offsetHeight}px`;
+			caret.style.animation = 'none';
+			void caret.offsetWidth;
+			caret.style.animation = '';
+			caret.style.transform = `translate(${caretX}px, ${caretY}px)`;
+		}
 	};
 
 	const clearTimer = () => {
