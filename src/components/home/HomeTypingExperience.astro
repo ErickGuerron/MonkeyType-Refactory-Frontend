@@ -21,25 +21,19 @@
           data-pref-value="quote"
           type="button">quote</button
         >
-        <button
-          class="typing-chip"
-          data-pref-key="defaultMode"
-          data-pref-value="words"
-          type="button">words</button
-        >
+        <label class="typing-config__select-shell typing-config__select-shell--chip">
+          <select class="typing-config__select typing-config__select--chip" data-pref-select="wordsMode" aria-label="Seleccionar modo words">
+            <option value="50">words 50</option>
+            <option value="100">words 100</option>
+            <option value="150">words 150</option>
+          </select>
+        </label>
         <button
           class="typing-chip"
           data-pref-key="defaultMode"
           data-pref-value="zen"
           type="button">zen</button
         >
-      </div>
-
-      <div class="typing-config__chips" data-words-config hidden>
-        <span class="typing-config__micro-label">words</span>
-        <button class="typing-chip" data-word-count="50" type="button">50</button>
-        <button class="typing-chip" data-word-count="100" type="button">100</button>
-        <button class="typing-chip" data-word-count="150" type="button">150</button>
       </div>
     </div>
 

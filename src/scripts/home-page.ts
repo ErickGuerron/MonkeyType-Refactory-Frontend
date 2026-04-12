@@ -80,23 +80,26 @@ function getQuoteLengthForMode(preferences: UserPreferences): 'short' | 'medium'
 		return TIME_TO_QUOTE_LENGTH[preferences.timeDuration];
 	}
 
-	if (preferences.defaultMode === 'quote') {
-		return 'long';
-	}
-
 	return 'short';
 }
 
 async function getQuoteWithFallback(
 	preferences: UserPreferences,
-	preferredLength = getQuoteLengthForMode(preferences)
+	preferredLength?: 'short' | 'medium' | 'long'
 ) {
-	const attempts: Array<{ language?: string; length?: 'short' | 'medium' | 'long' }> = [
-		{ language: preferences.language, length: preferredLength },
-		{ language: preferences.language },
-		{ language: 'english', length: preferredLength },
-		{}
-	];
+	const resolvedLength = preferredLength ?? (preferences.defaultMode === 'quote' ? undefined : getQuoteLengthForMode(preferences));
+	const attempts: Array<{ language?: string; length?: 'short' | 'medium' | 'long' }> = resolvedLength
+		? [
+			{ language: preferences.language, length: resolvedLength },
+			{ language: preferences.language },
+			{ language: 'english', length: resolvedLength },
+			{}
+		]
+		: [
+			{ language: preferences.language },
+			{ language: 'english' },
+			{}
+		];
 
 	let lastError: unknown = null;
 
@@ -129,6 +132,25 @@ function sliceTextToWordCount(text: string, wordCount: WordModeCount) {
 
 function countWords(text: string) {
 	return text.trim().split(/\s+/).filter(Boolean).length;
+}
+
+function getCorrectPrefixLength(input: string, target: string) {
+	const comparableLength = Math.min(input.length, target.length);
+	for (let index = 0; index < comparableLength; index += 1) {
+		if (input[index] !== target[index]) {
+			return index;
+		}
+	}
+
+	return comparableLength;
+}
+
+function countCompletedWords(input: string, target: string) {
+	const prefix = target.slice(0, getCorrectPrefixLength(input, target));
+	const tokens = prefix.match(/\S+\s+/g) || [];
+	const nextCharacter = target[prefix.length] || '';
+	const endsWithCompleteWord = /\S+$/.test(prefix) && (prefix.length === target.length || /\s/.test(nextCharacter));
+	return tokens.length + (endsWithCompleteWord ? 1 : 0);
 }
 
 function createSyntheticQuote(text: string, source: string | null, language: string, length: TypingQuote['length']): TypingQuote {
@@ -401,8 +423,6 @@ export function initHomePage() {
 	const statMode = page.querySelector<HTMLElement>('[data-current-mode]');
 	const statLanguage = page.querySelector<HTMLElement>('[data-current-language]');
 	const liveWpmCard = page.querySelector<HTMLElement>('[data-live-wpm-card]');
-	const wordCountGroup = page.querySelector<HTMLElement>('[data-words-config]');
-	const wordCountButtons = Array.from(page.querySelectorAll<HTMLButtonElement>('[data-word-count]'));
 	const finishZenButtons = Array.from(page.querySelectorAll<HTMLButtonElement>('[data-action="finish-zen"]'));
 	const restartButtons = Array.from(page.querySelectorAll<HTMLButtonElement>('[data-action="restart"]'));
 	const nextQuoteButtons = Array.from(page.querySelectorAll<HTMLButtonElement>('[data-action="next-quote"]'));
@@ -773,23 +793,45 @@ export function initHomePage() {
 				return;
 			}
 
+			if (key === 'wordsMode') {
+				select.value = String(state.wordCount);
+				select.disabled = state.isUpdatingPreferences;
+				return;
+			}
+
 			select.value = String(state.preferences[key]);
 			select.disabled = state.isUpdatingPreferences;
 		});
 
-		wordCountGroup?.toggleAttribute('hidden', state.preferences.defaultMode !== 'words');
-		wordCountButtons.forEach((button) => {
-			button.classList.toggle('is-active', Number(button.dataset.wordCount) === state.wordCount);
-			button.disabled = state.isUpdatingPreferences || state.preferences.defaultMode !== 'words';
-		});
 		finishZenButtons.forEach((button) => {
 			button.hidden = state.preferences.defaultMode !== 'zen';
 		});
 	};
 
+	const getProgressLabel = () => {
+		if (!state.quote) {
+			return '—';
+		}
+
+		if (state.preferences.defaultMode === 'words') {
+			return `${Math.min(countCompletedWords(textArea.value, state.quote.text), state.wordCount)}/${state.wordCount}`;
+		}
+
+		if (state.preferences.defaultMode === 'quote') {
+			const totalWords = countWords(state.quote.text);
+			return `${Math.min(countCompletedWords(textArea.value, state.quote.text), totalWords)}/${totalWords}`;
+		}
+
+		return state.startedAt ? formatDuration(Math.ceil((Date.now() - state.startedAt) / 1000)) : '—';
+	};
+
 	const syncPreferenceLabels = () => {
 		statMode.textContent = getModeDisplayLabel(state.preferences, state.wordCount);
-		statTimerLabel.textContent = state.preferences.defaultMode === 'time' ? 'time' : 'elapsed';
+		statTimerLabel.textContent = state.preferences.defaultMode === 'time'
+			? 'time'
+			: state.preferences.defaultMode === 'zen'
+				? 'elapsed'
+				: 'words';
 		statLanguage.textContent = getLanguageLabel(state.quote?.language || state.preferences.language);
 		typingHint.textContent = state.preferences.defaultMode === 'zen'
 			? 'write freely — ctrl+enter or finish zen when you want to save the run'
@@ -800,7 +842,21 @@ export function initHomePage() {
 		syncPreferenceButtons();
 	};
 
-	const getInitialTimerLabel = () => (state.preferences.defaultMode === 'time' ? `${state.preferences.timeDuration}s` : '—');
+	const getInitialTimerLabel = () => {
+		if (state.preferences.defaultMode === 'time') {
+			return `${state.preferences.timeDuration}s`;
+		}
+
+		if (state.preferences.defaultMode === 'words') {
+			return `0/${state.wordCount}`;
+		}
+
+		if (state.preferences.defaultMode === 'quote' && state.quote) {
+			return `0/${countWords(state.quote.text)}`;
+		}
+
+		return '—';
+	};
 
 	const updateStats = (metrics: TypingMetrics, timeLabel: string) => {
 		statWpm.textContent = formatMetric(metrics.wpm);
@@ -1018,9 +1074,11 @@ export function initHomePage() {
 		const timeLabel =
 			state.preferences.defaultMode === 'time'
 				? `${remainingSeconds}s`
-				: state.startedAt
-					? formatDuration(elapsedSeconds)
-					: '—';
+				: state.preferences.defaultMode === 'zen'
+					? state.startedAt
+						? formatDuration(elapsedSeconds)
+						: '—'
+					: getProgressLabel();
 
 		updateStats(metrics, timeLabel);
 		renderQuoteText(quoteText, state.quote.text, textArea.value, state.preferences.defaultMode, state.completed);
@@ -1158,19 +1216,6 @@ export function initHomePage() {
 		});
 	});
 
-	wordCountButtons.forEach((button) => {
-		button.addEventListener('click', () => {
-			const nextWordCount = Number(button.dataset.wordCount) as WordModeCount;
-			if (!WORD_MODE_COUNTS.includes(nextWordCount) || state.wordCount === nextWordCount) {
-				return;
-			}
-
-			state.wordCount = nextWordCount;
-			syncPreferenceLabels();
-			void loadQuote();
-		});
-	});
-
 	finishZenButtons.forEach((button) => {
 		button.addEventListener('click', () => {
 			if (state.preferences.defaultMode !== 'zen' || state.completed || textArea.value.trim().length === 0) {
@@ -1235,8 +1280,32 @@ export function initHomePage() {
 	});
 
 	configSelects.forEach((select) => {
+		select.addEventListener('pointerdown', () => {
+			const key = select.dataset.prefSelect as 'timeMode' | 'wordsMode' | undefined;
+			if (state.isUpdatingPreferences || !key) {
+				return;
+			}
+
+			if (key === 'timeMode' && state.preferences.defaultMode !== 'time') {
+				const currentDuration = Number(select.value) as UserPreferences['timeDuration'];
+				void updatePreferences({ defaultMode: 'time', timeDuration: currentDuration });
+				return;
+			}
+
+			if (key === 'wordsMode' && state.preferences.defaultMode !== 'words') {
+				const currentWordCount = Number(select.value) as WordModeCount;
+				if (!WORD_MODE_COUNTS.includes(currentWordCount)) {
+					return;
+				}
+
+				state.wordCount = currentWordCount;
+				syncPreferenceLabels();
+				void updatePreferences({ defaultMode: 'words' });
+			}
+		});
+
 		select.addEventListener('change', () => {
-			const key = select.dataset.prefSelect as keyof UserPreferences | 'timeMode' | undefined;
+			const key = select.dataset.prefSelect as keyof UserPreferences | 'timeMode' | 'wordsMode' | undefined;
 			if (!key) {
 				return;
 			}
@@ -1250,6 +1319,23 @@ export function initHomePage() {
 				}
 
 				void updatePreferences({ defaultMode: 'time', timeDuration: nextDuration });
+				return;
+			}
+
+			if (key === 'wordsMode') {
+				const nextWordCount = Number(rawValue) as WordModeCount;
+				if (!WORD_MODE_COUNTS.includes(nextWordCount)) {
+					return;
+				}
+
+				const isSameWordsMode = state.preferences.defaultMode === 'words' && state.wordCount === nextWordCount;
+				if (isSameWordsMode) {
+					return;
+				}
+
+				state.wordCount = nextWordCount;
+				syncPreferenceLabels();
+				void updatePreferences({ defaultMode: 'words' });
 				return;
 			}
 
