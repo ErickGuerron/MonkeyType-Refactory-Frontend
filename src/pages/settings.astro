@@ -40,6 +40,21 @@ const themeOptions = [
 	pageDescription="The visual structure stays deep and organized, but now theme, quote language, default mode, time duration, live WPM, punctuation, numbers, and sound are read from and persisted to the real API."
 	pageDescriptionKey="settings.pageDescription"
 >
+	<div slot="pageIntroAside" class="settings-hero-aside">
+		<section class="settings-hero-terminal" aria-hidden="true">
+			<div class="settings-hero-terminal__chrome">
+				<span class="is-red"></span>
+				<span class="is-yellow"></span>
+				<span class="is-green"></span>
+			</div>
+			<div class="settings-hero-typing" data-settings-hero-typing aria-label="SETTINGS / CONFIGURACIONES">
+				<span class="settings-hero-typing__prompt">&gt;</span>
+				<span class="settings-hero-typing__text" data-settings-hero-typing-text>SETTINGS</span>
+				<span class="settings-hero-typing__cursor" aria-hidden="true"></span>
+			</div>
+		</section>
+	</div>
+
 	<section class="settings-page" data-settings-page>
 		<article class="terminal-panel settings-profile">
 			<div>
@@ -187,6 +202,115 @@ const themeOptions = [
 	.settings-page {
 		display: grid;
 		gap: 1rem;
+	}
+
+	.settings-hero-aside {
+		display: flex;
+		align-items: stretch;
+		justify-content: flex-end;
+		width: 100%;
+	}
+
+	.settings-hero-terminal {
+		position: relative;
+		display: flex;
+		flex-direction: column;
+		justify-content: flex-start;
+		width: min(100%, 28rem);
+		min-height: 21rem;
+		padding: 1.1rem 1.25rem 1.4rem;
+		border: 1px solid color-mix(in srgb, var(--accent) 28%, transparent);
+		border-radius: 1.15rem;
+		background:
+			linear-gradient(180deg, rgba(255, 255, 255, 0.015), transparent 22%),
+			rgba(14, 14, 14, 0.82);
+		box-shadow:
+			0 0 0 1px rgba(224, 193, 109, 0.05),
+			0 0 24px rgba(224, 193, 109, 0.12),
+			inset 0 0 32px rgba(0, 0, 0, 0.22);
+		overflow: hidden;
+	}
+
+	.settings-hero-terminal::after {
+		content: '';
+		position: absolute;
+		inset: 0;
+		border-radius: inherit;
+		box-shadow: inset 0 0 0 1px rgba(224, 193, 109, 0.06);
+		pointer-events: none;
+	}
+
+	.settings-hero-terminal__chrome {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.35rem;
+		min-height: 1rem;
+	}
+
+	.settings-hero-terminal__chrome span {
+		width: 0.5rem;
+		height: 0.5rem;
+		border-radius: 999px;
+		opacity: 0.75;
+	}
+
+	.settings-hero-terminal__chrome .is-red {
+		background: #7a3128;
+	}
+
+	.settings-hero-terminal__chrome .is-yellow {
+		background: #8a6c1f;
+	}
+
+	.settings-hero-terminal__chrome .is-green {
+		background: #365d32;
+	}
+
+	.settings-hero-typing {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		gap: 0.7rem;
+		flex: 1;
+		min-height: 100%;
+		padding: 1rem 0;
+		font-family: var(--font-mono);
+		font-size: clamp(1.35rem, 2.8vw, 2.05rem);
+		font-weight: 600;
+		letter-spacing: 0.12em;
+		text-transform: uppercase;
+		color: var(--accent);
+		white-space: nowrap;
+	}
+
+	.settings-hero-typing__prompt {
+		color: var(--accent-strong);
+	}
+
+	.settings-hero-typing__text {
+		display: inline-block;
+		min-width: 1ch;
+	}
+
+	.settings-hero-typing__cursor {
+		width: 0.12em;
+		height: 1.1em;
+		margin-left: 0.22em;
+		border-radius: 999px;
+		background: currentColor;
+		animation: settings-hero-cursor-blink 1s steps(1, end) infinite;
+	}
+
+	@keyframes settings-hero-cursor-blink {
+		0%,
+		49% {
+			opacity: 1;
+		}
+
+		50%,
+		100% {
+			opacity: 0;
+		}
 	}
 
 	.settings-profile {
@@ -360,6 +484,15 @@ const themeOptions = [
 	}
 
 	@media (max-width: 900px) {
+		.settings-hero-aside {
+			justify-content: flex-start;
+		}
+
+		.settings-hero-terminal {
+			width: min(100%, 34rem);
+			min-height: 16rem;
+		}
+
 		.settings-grid {
 			grid-template-columns: 1fr;
 		}
@@ -374,6 +507,21 @@ const themeOptions = [
 	}
 
 	@media (max-width: 640px) {
+		.settings-hero-aside {
+			align-items: stretch;
+		}
+
+		.settings-hero-terminal {
+			min-height: 13rem;
+			padding-inline: 1rem;
+		}
+
+		.settings-hero-typing {
+			justify-content: center;
+			font-size: clamp(1rem, 5vw, 1.35rem);
+			letter-spacing: 0.08em;
+		}
+
 		.settings-profile,
 		.settings-card__header,
 		.settings-toggle,

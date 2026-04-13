@@ -1,5 +1,6 @@
 import { ApiError } from '../lib/auth-api';
 import { showErrorAlert, showToast } from '../lib/alerts';
+import { getCurrentUiLocale } from '../lib/i18n';
 import {
 	DEFAULT_PREFERENCES,
 	getMyPreferences,
@@ -89,6 +90,80 @@ function describePreferences(target: HTMLElement, preferences: UserPreferences) 
 	});
 }
 
+function initHeroTypingEffect() {
+	const heroTyping = document.querySelector<HTMLElement>('[data-settings-hero-typing]');
+	const textNode = document.querySelector<HTMLElement>('[data-settings-hero-typing-text]');
+
+	if (!heroTyping || !textNode || heroTyping.dataset.bound === 'true') {
+		return;
+	}
+
+	heroTyping.dataset.bound = 'true';
+	const typeDelay = 110;
+	const eraseDelay = 60;
+	const holdAfterType = 1400;
+	const holdAfterErase = 320;
+	let activeRun = 0;
+	let charIndex = 0;
+	let isDeleting = false;
+
+	const getWordForLocale = () => (getCurrentUiLocale() === 'es' ? 'CONFIGURACIONES' : 'SETTINGS');
+
+	const scheduleNext = (callback: () => void, delay: number, runId: number) => {
+		window.setTimeout(() => {
+			if (runId !== activeRun) {
+				return;
+			}
+
+			callback();
+		}, delay);
+	};
+
+	const startAnimation = () => {
+		activeRun += 1;
+		const runId = activeRun;
+		charIndex = 0;
+		isDeleting = false;
+		textNode.textContent = '';
+
+		const tick = () => {
+			const word = getWordForLocale();
+
+			if (!isDeleting) {
+				charIndex = Math.min(charIndex + 1, word.length);
+				textNode.textContent = word.slice(0, charIndex);
+
+				if (charIndex === word.length) {
+					scheduleNext(() => {
+						isDeleting = true;
+						tick();
+					}, holdAfterType, runId);
+					return;
+				}
+
+				scheduleNext(tick, typeDelay, runId);
+				return;
+			}
+
+			charIndex = Math.max(charIndex - 1, 0);
+			textNode.textContent = word.slice(0, charIndex);
+
+			if (charIndex === 0) {
+				isDeleting = false;
+				scheduleNext(tick, holdAfterErase, runId);
+				return;
+			}
+
+			scheduleNext(tick, eraseDelay, runId);
+		};
+
+		tick();
+	};
+
+	startAnimation();
+	window.addEventListener('monkeytype:localechange', startAnimation);
+}
+
 export function initSettingsPage() {
 	const session = requireSession();
 	if (!session) {
@@ -101,6 +176,7 @@ export function initSettingsPage() {
 	}
 
 	page.dataset.bound = 'true';
+	initHeroTypingEffect();
 
 	const form = page.querySelector<HTMLFormElement>('[data-preferences-form]');
 	const status = page.querySelector<HTMLElement>('[data-settings-status]');

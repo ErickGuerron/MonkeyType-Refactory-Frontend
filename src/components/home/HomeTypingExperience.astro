@@ -335,17 +335,20 @@
 
 	.typing-config__select-shell {
 		position: relative;
-		display: block;
+		display: inline-flex;
+		align-items: center;
+		width: fit-content;
+		max-width: 100%;
 	}
 
 	.typing-config__select-shell--chip {
-		flex: 1 1 7.25rem;
+		flex: 0 0 auto;
 		min-width: 0;
-		max-width: 10rem;
+		max-width: 100%;
 	}
 
 	.typing-config__select-shell--signal {
-		flex: 1 1 8rem;
+		align-self: center;
 	}
 
 	.typing-config__select-shell--signal[hidden] {
@@ -364,7 +367,8 @@
 	}
 
 	.typing-config__select {
-		width: 100%;
+		width: auto;
+		max-width: 100%;
 		min-height: 1.95rem;
 		padding: 0.3rem 2rem 0.3rem 0.7rem;
 		border: 0;
@@ -383,7 +387,7 @@
 
 	.typing-config__select--chip {
 		min-width: 0;
-		width: 100%;
+		width: auto;
 		background: color-mix(in srgb, var(--text) 3%, transparent);
 		color: var(--text-dim);
 	}

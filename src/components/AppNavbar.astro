@@ -1,145 +1,189 @@
 ---
-import BrandMark from './BrandMark.astro';
+import BrandMark from "./BrandMark.astro";
 
-type NavbarMode = 'public' | 'private';
+type NavbarMode = "public" | "private";
 
 interface Props {
-	mode?: NavbarMode;
-	activeHref?: string;
+  mode?: NavbarMode;
+  activeHref?: string;
 }
 
-const { mode = 'public', activeHref = '/' } = Astro.props;
+const { mode = "public", activeHref = "/" } = Astro.props;
 
-const publicLinks = [
-	{ href: '/', label: 'Home' },
-	{ href: '/login', label: 'Login' },
-	{ href: '/register', label: 'Register' }
+interface NavLink {
+  href: string;
+  label: string;
+  icon?: string;
+}
+
+const publicLinks: NavLink[] = [
+  { href: "/", label: "Home" },
+  { href: "/login", label: "Login" },
+  { href: "/register", label: "Register" },
 ];
 
-const privateLinks = [
-	{ href: '/home', label: 'typing', icon: '⌨' },
-	{ href: '/settings', label: 'settings', icon: '⚙' }
+const privateLinks: NavLink[] = [
+  { href: "/home", label: "typing", icon: "⌨" },
+  { href: "/settings", label: "settings", icon: "⚙" },
 ];
 
-const links = (mode === 'public' ? publicLinks : privateLinks).map((link) => ({
-	...link,
-	isActive: link.href === activeHref
+const links = (mode === "public" ? publicLinks : privateLinks).map((link) => ({
+  ...link,
+  isActive: link.href === activeHref,
 }));
 ---
 
-<header class:list={['app-navbar', mode === 'private' && 'is-private']}>
-	<div class:list={['container', 'app-navbar__inner', mode === 'public' && 'terminal-panel']}>
-		<BrandMark compact={mode === 'private'} minimal={mode === 'private'} />
+<header
+  class:list={["app-navbar", mode === "private" && "is-private"]}
+  data-active-href={activeHref}
+>
+  <div
+    class:list={[
+      "container",
+      "app-navbar__inner",
+      mode === "public" && "terminal-panel",
+    ]}
+  >
+    <BrandMark compact={mode === "private"} minimal={mode === "private"} />
 
-		<nav class="app-navbar__nav" aria-label="Principal">
-			{links.map((link) => (
-				<a class:list={[link.isActive && 'is-active']} href={link.href}>
-					{link.icon && <span aria-hidden="true">{link.icon}</span>}
-					<span data-i18n={link.href === '/' ? 'nav.home' : link.href === '/login' ? 'nav.login' : link.href === '/register' ? 'nav.register' : link.href === '/home' ? 'nav.typing' : 'nav.settings'}>{link.label}</span>
-				</a>
-			))}
-		</nav>
+    <nav class="app-navbar__nav" aria-label="Principal">
+      {
+        links.map((link) => (
+          <a class:list={[link.isActive && "is-active"]} href={link.href}>
+            {link.icon && <span aria-hidden="true">{link.icon}</span>}
+            <span
+              data-i18n={
+                link.href === "/"
+                  ? "nav.home"
+                  : link.href === "/login"
+                    ? "nav.login"
+                    : link.href === "/register"
+                      ? "nav.register"
+                      : link.href === "/home"
+                        ? "nav.typing"
+                        : "nav.settings"
+              }
+            >
+              {link.label}
+            </span>
+          </a>
+        ))
+      }
+    </nav>
 
-		<div class="app-navbar__actions">
-			{mode === 'private' && <span class="app-navbar__hint mono" data-i18n="nav.hint">monkey see monkey type</span>}
-		</div>
-	</div>
+    <div class="app-navbar__actions">
+      {
+        mode === "private" && (
+          <span class="app-navbar__hint mono" data-i18n="nav.hint">
+            monkey see monkey type
+          </span>
+        )
+      }
+    </div>
+  </div>
 </header>
 
 <style>
-	.app-navbar {
-		padding: 1rem 0 0;
-	}
+  .app-navbar {
+    padding: 1rem 0 0;
+  }
 
-	.app-navbar.is-private {
-		border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-	}
+  .app-navbar.is-private {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  }
 
-	.app-navbar__inner {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		gap: 1.25rem;
-		padding: 0.7rem 0 0.85rem;
-	}
+  .app-navbar__inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.25rem;
+    padding: 0.7rem 0 0.85rem;
+  }
 
-	.app-navbar :global(.brand-mark) {
-		min-width: max-content;
-	}
+  .app-navbar :global(.brand-mark) {
+    min-width: max-content;
+  }
 
-	.app-navbar__nav,
-	.app-navbar__actions {
-		display: flex;
-		align-items: center;
-		gap: 0.45rem;
-	}
+  .app-navbar[data-active-href="/settings"] :global(.brand-mark__glyph) {
+    display: none;
+  }
 
-	.app-navbar__nav a {
-		display: inline-flex;
-		align-items: center;
-		gap: 0.5rem;
-		padding: 0.6rem 0.8rem;
-		border-radius: 999px;
-		font-family: var(--font-mono);
-		font-size: 0.74rem;
-		letter-spacing: 0.1em;
-		text-transform: lowercase;
-		color: var(--text-muted);
-		transition: color 160ms ease, background-color 160ms ease, transform 160ms ease;
-	}
+  .app-navbar__nav,
+  .app-navbar__actions {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+  }
 
-	.app-navbar__nav a:hover,
-	.app-navbar__nav a.is-active {
-		background: rgba(255, 255, 255, 0.04);
-		color: var(--accent);
-		transform: translateY(-1px);
-	}
+  .app-navbar__nav a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem 0.8rem;
+    border-radius: 999px;
+    font-family: var(--font-mono);
+    font-size: 0.74rem;
+    letter-spacing: 0.1em;
+    text-transform: lowercase;
+    color: var(--text-muted);
+    transition:
+      color 160ms ease,
+      background-color 160ms ease,
+      transform 160ms ease;
+  }
 
-	.app-navbar__hint {
-		color: var(--text-dim);
-		font-size: 0.68rem;
-		letter-spacing: 0.16em;
-		text-transform: uppercase;
-	}
+  .app-navbar__nav a:hover,
+  .app-navbar__nav a.is-active {
+    background: rgba(255, 255, 255, 0.04);
+    color: var(--accent);
+    transform: translateY(-1px);
+  }
 
-	.app-navbar__nav a span {
-		font-size: 0.92rem;
-	}
+  .app-navbar__hint {
+    color: var(--text-dim);
+    font-size: 0.68rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+  }
 
-	@media (max-width: 960px) {
-		.app-navbar__inner {
-			flex-wrap: wrap;
-		}
+  .app-navbar__nav a span {
+    font-size: 0.92rem;
+  }
 
-		.app-navbar__nav {
-			order: 3;
-			width: 100%;
-			justify-content: flex-start;
-			padding-top: 0.35rem;
-			border-top: 1px solid rgba(255, 255, 255, 0.06);
-		}
-	}
+  @media (max-width: 960px) {
+    .app-navbar__inner {
+      flex-wrap: wrap;
+    }
 
-	@media (max-width: 640px) {
-		.app-navbar__inner,
-		.app-navbar__actions,
-		.app-navbar__nav {
-			align-items: stretch;
-		}
+    .app-navbar__nav {
+      order: 3;
+      width: 100%;
+      justify-content: flex-start;
+      padding-top: 0.35rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+    }
+  }
 
-		.app-navbar__inner,
-		.app-navbar__actions {
-			flex-direction: column;
-		}
+  @media (max-width: 640px) {
+    .app-navbar__inner,
+    .app-navbar__actions,
+    .app-navbar__nav {
+      align-items: stretch;
+    }
 
-		.app-navbar__nav {
-			flex-wrap: wrap;
-			justify-content: center;
-		}
+    .app-navbar__inner,
+    .app-navbar__actions {
+      flex-direction: column;
+    }
 
-		.app-navbar__actions {
-			width: 100%;
-			justify-content: center;
-		}
-	}
+    .app-navbar__nav {
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .app-navbar__actions {
+      width: 100%;
+      justify-content: center;
+    }
+  }
 </style>

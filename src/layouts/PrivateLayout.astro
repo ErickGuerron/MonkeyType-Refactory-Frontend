@@ -34,6 +34,8 @@ const {
 	showPageIntro = true,
 	layoutWidth = 'default'
 } = Astro.props;
+
+const hasPageIntroAside = Astro.slots.has('pageIntroAside');
 ---
 
 <Layout title={title} description={description} titleKey={titleKey} descriptionKey={descriptionKey} bodyClass="theme-private">
@@ -42,10 +44,17 @@ const {
 
 		<main class:list={['private-layout', layoutWidth === 'typing' ? 'private-layout--typing' : '', layoutWidth === 'typing' ? 'container-wide' : 'container']}>
 			{showPageIntro && (
-				<section class="private-layout__hero terminal-panel">
-					<span class="eyebrow" data-i18n={pageEyebrowKey}>{pageEyebrow}</span>
-					<h1 data-i18n={pageTitleKey}>{pageTitle}</h1>
-					<p data-i18n={pageDescriptionKey}>{pageDescription}</p>
+				<section class:list={['private-layout__hero', 'terminal-panel', hasPageIntroAside ? 'private-layout__hero--with-aside' : '']}>
+					<div class="private-layout__hero-main">
+						<span class="eyebrow" data-i18n={pageEyebrowKey}>{pageEyebrow}</span>
+						<h1 data-i18n={pageTitleKey}>{pageTitle}</h1>
+						<p data-i18n={pageDescriptionKey}>{pageDescription}</p>
+					</div>
+					{hasPageIntroAside && (
+						<div class="private-layout__hero-aside">
+							<slot name="pageIntroAside" />
+						</div>
+					)}
 				</section>
 			)}
 
@@ -73,6 +82,24 @@ const {
 		border-radius: 24px;
 	}
 
+	.private-layout__hero--with-aside {
+		display: grid;
+		grid-template-columns: minmax(0, 0.95fr) minmax(20rem, 1.05fr);
+		gap: 2rem;
+		align-items: center;
+	}
+
+	.private-layout__hero-main {
+		min-width: 0;
+	}
+
+	.private-layout__hero-aside {
+		display: flex;
+		justify-content: flex-end;
+		align-items: center;
+		min-height: 100%;
+	}
+
 	.private-layout__hero h1 {
 		margin: 1rem 0 0.8rem;
 		max-width: 12ch;
@@ -83,7 +110,17 @@ const {
 
 	.private-layout__hero p {
 		margin: 0;
-		max-width: 48rem;
+		max-width: 32rem;
 		color: var(--text-muted);
+	}
+
+	@media (max-width: 900px) {
+		.private-layout__hero--with-aside {
+			grid-template-columns: 1fr;
+		}
+
+		.private-layout__hero-aside {
+			justify-content: flex-start;
+		}
 	}
 </style>

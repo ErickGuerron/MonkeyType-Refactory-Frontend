@@ -11,16 +11,31 @@ import Layout from '../layouts/Layout.astro';
 
 		<main class="landing container">
 			<section class="landing__hero terminal-panel">
-				<div>
+				<div class="landing__hero-copy">
 					<span class="eyebrow" data-i18n="landing.eyebrow">Typing focus</span>
 					<h1 data-i18n="landing.heroTitle">Write with rhythm, measure your progress, and keep your account ready.</h1>
 					<p data-i18n="landing.heroBody">MonkeyType welcomes you with a minimal, dark, and direct experience: sign in, practice, return to your space, and tune how each session should feel.</p>
 				</div>
 
-				<div class="landing__actions">
-					<a class="button-primary" href="/register" data-i18n="landing.ctaRegister">Create account</a>
-					<a class="button-secondary" href="/login" data-i18n="landing.ctaLogin">Sign in</a>
-					<a class="button-ghost" href="/home" data-i18n="landing.ctaPrivate">Go to my space</a>
+				<div class="landing__hero-side">
+					<section class="landing__hero-terminal" aria-hidden="true">
+						<div class="landing__hero-terminal__chrome">
+							<span class="is-red"></span>
+							<span class="is-yellow"></span>
+							<span class="is-green"></span>
+						</div>
+						<div class="landing__hero-typing" data-landing-hero-typing aria-label="MONKEYTYPE LEARN TYPING">
+							<span class="landing__hero-typing-prompt">&gt;</span>
+							<span class="landing__hero-typing-text" data-landing-hero-typing-text>MONKEYTYPE LEARN TYPING</span>
+							<span class="landing__hero-typing-cursor" aria-hidden="true"></span>
+						</div>
+					</section>
+
+					<div class="landing__actions">
+						<a class="button-primary" href="/register" data-i18n="landing.ctaRegister">Create account</a>
+						<a class="button-secondary" href="/login" data-i18n="landing.ctaLogin">Sign in</a>
+						<a class="button-ghost" href="/home" data-i18n="landing.ctaPrivate">Go to my space</a>
+					</div>
 				</div>
 			</section>
 
@@ -51,6 +66,58 @@ import Layout from '../layouts/Layout.astro';
 	</div>
 </Layout>
 
+<script>
+	import { initLandingPage } from '../scripts/auth-client';
+
+	initLandingPage();
+
+	const heroTyping = document.querySelector('[data-landing-hero-typing]');
+	const heroTypingText = document.querySelector('[data-landing-hero-typing-text]');
+
+	if (heroTyping instanceof HTMLElement && heroTypingText instanceof HTMLElement && heroTyping.dataset.bound !== 'true') {
+		heroTyping.dataset.bound = 'true';
+		const phrase = 'MONKEYTYPE LEARN TYPING';
+		const typeDelay = 95;
+		const eraseDelay = 48;
+		const holdAfterType = 1600;
+		const holdAfterErase = 420;
+		let charIndex = 0;
+		let isDeleting = false;
+
+		const tick = () => {
+			if (!isDeleting) {
+				charIndex = Math.min(charIndex + 1, phrase.length);
+				heroTypingText.textContent = phrase.slice(0, charIndex);
+
+				if (charIndex === phrase.length) {
+					window.setTimeout(() => {
+						isDeleting = true;
+						tick();
+					}, holdAfterType);
+					return;
+				}
+
+				window.setTimeout(tick, typeDelay);
+				return;
+			}
+
+			charIndex = Math.max(charIndex - 1, 0);
+			heroTypingText.textContent = phrase.slice(0, charIndex);
+
+			if (charIndex === 0) {
+				isDeleting = false;
+				window.setTimeout(tick, holdAfterErase);
+				return;
+			}
+
+			window.setTimeout(tick, eraseDelay);
+		};
+
+		heroTypingText.textContent = '';
+		tick();
+	}
+</script>
+
 <style>
 	.landing {
 		display: grid;
@@ -66,14 +133,18 @@ import Layout from '../layouts/Layout.astro';
 
 	.landing__hero {
 		display: grid;
-		grid-template-columns: minmax(0, 1fr) auto;
-		gap: 1.5rem;
-		align-items: end;
+		grid-template-columns: minmax(0, 0.98fr) minmax(20rem, 1.02fr);
+		gap: 2rem;
+		align-items: center;
+	}
+
+	.landing__hero-copy {
+		min-width: 0;
 	}
 
 	.landing__hero h1 {
 		margin: 1rem 0;
-		max-width: 15ch;
+		max-width: 13ch;
 		font-family: var(--font-display);
 		font-size: clamp(2.7rem, 6vw, 5rem);
 		line-height: 0.96;
@@ -86,11 +157,117 @@ import Layout from '../layouts/Layout.astro';
 		color: var(--text-muted);
 	}
 
+	.landing__hero p {
+		max-width: 31rem;
+	}
+
+	.landing__hero-side {
+		display: grid;
+		gap: 1.1rem;
+		justify-items: end;
+	}
+
+	.landing__hero-terminal {
+		position: relative;
+		display: flex;
+		flex-direction: column;
+		justify-content: flex-start;
+		width: min(100%, 30.5rem);
+		min-height: 21rem;
+		padding: 1.1rem 1.25rem 1.4rem;
+		border: 1px solid color-mix(in srgb, var(--accent) 28%, transparent);
+		border-radius: 1.15rem;
+		background:
+			linear-gradient(180deg, rgba(255, 255, 255, 0.015), transparent 22%),
+			rgba(14, 14, 14, 0.82);
+		box-shadow:
+			0 0 0 1px rgba(224, 193, 109, 0.05),
+			0 0 24px rgba(224, 193, 109, 0.12),
+			inset 0 0 32px rgba(0, 0, 0, 0.22);
+		overflow: hidden;
+	}
+
+	.landing__hero-terminal::after {
+		content: '';
+		position: absolute;
+		inset: 0;
+		border-radius: inherit;
+		box-shadow: inset 0 0 0 1px rgba(224, 193, 109, 0.06);
+		pointer-events: none;
+	}
+
+	.landing__hero-terminal__chrome {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.35rem;
+		min-height: 1rem;
+	}
+
+	.landing__hero-terminal__chrome span {
+		width: 0.5rem;
+		height: 0.5rem;
+		border-radius: 999px;
+		opacity: 0.75;
+	}
+
+	.landing__hero-terminal__chrome .is-red {
+		background: #7a3128;
+	}
+
+	.landing__hero-terminal__chrome .is-yellow {
+		background: #8a6c1f;
+	}
+
+	.landing__hero-terminal__chrome .is-green {
+		background: #365d32;
+	}
+
+	.landing__hero-typing {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		gap: 0.7rem;
+		flex: 1;
+		min-height: 100%;
+		padding: 1rem 0;
+		font-family: var(--font-mono);
+		font-size: clamp(1.05rem, 2.2vw, 1.55rem);
+		font-weight: 600;
+		letter-spacing: 0.12em;
+		text-transform: uppercase;
+		color: var(--accent);
+		white-space: nowrap;
+	}
+
+	.landing__hero-typing-prompt {
+		color: var(--accent-strong);
+	}
+
+	.landing__hero-typing-text {
+		display: inline-block;
+		min-width: 1ch;
+	}
+
+	.landing__hero-typing-cursor {
+		width: 0.12em;
+		height: 1.1em;
+		margin-left: 0.05em;
+		border-radius: 999px;
+		background: currentColor;
+		animation: landing-hero-cursor-blink 1s steps(1, end) infinite;
+	}
+
+	@keyframes landing-hero-cursor-blink {
+		0%, 49% { opacity: 1; }
+		50%, 100% { opacity: 0; }
+	}
+
 	.landing__actions {
 		display: flex;
 		flex-wrap: wrap;
-		justify-content: flex-end;
+		justify-content: flex-start;
 		gap: 0.8rem;
+		width: min(100%, 30.5rem);
 	}
 
 	.landing__grid {
@@ -118,8 +295,30 @@ import Layout from '../layouts/Layout.astro';
 			grid-template-columns: 1fr;
 		}
 
+		.landing__hero-side {
+			justify-items: start;
+		}
+
+		.landing__hero-terminal {
+			width: min(100%, 34rem);
+			min-height: 16rem;
+		}
+
 		.landing__actions {
 			justify-content: flex-start;
+			width: 100%;
+		}
+	}
+
+	@media (max-width: 640px) {
+		.landing__hero-terminal {
+			min-height: 12rem;
+			padding-inline: 1rem;
+		}
+
+		.landing__hero-typing {
+			font-size: clamp(0.82rem, 4.3vw, 1.05rem);
+			letter-spacing: 0.08em;
 		}
 	}
 </style>

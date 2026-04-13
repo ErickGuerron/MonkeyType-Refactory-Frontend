@@ -245,6 +245,8 @@ const translations: Record<UiLocale, TranslationDictionary> = {
 		'auth.validation.passwordMismatch': 'Passwords do not match.',
 		'auth.reset.updatedTitle': 'Password updated',
 		'auth.reset.updatedBody': 'You can now sign in with your new password.',
+		'auth.reset.invalidLinkTitle': 'Invalid or expired link',
+		'auth.reset.invalidLinkBody': 'Request a new recovery link to keep going.',
 		'auth.validation.completeRequired': 'Complete the required fields.',
 		'auth.validation.enterVisibleName': 'Enter a visible name for your account.',
 		'auth.toast.loginSuccessTitle': 'Login successful',
@@ -258,7 +260,19 @@ const translations: Record<UiLocale, TranslationDictionary> = {
 		'auth.session.validating': 'Validating session against /api/auth/me...',
 		'auth.session.validated': 'Session validated successfully against the backend.',
 		'auth.session.redirectingLogin': '{message} Redirecting to login...',
-		'auth.session.expiredRedirecting': 'Session expired. Redirecting to login...'
+		'auth.session.expiredRedirecting': 'Session expired. Redirecting to login...',
+		'apiErrors.INVALID_EMAIL': 'Enter a valid email to continue.',
+		'apiErrors.INVALID_PASSWORD': 'Password must be at least 8 characters long.',
+		'apiErrors.INVALID_NAME': 'Enter a valid visible name.',
+		'apiErrors.INVALID_CREDENTIALS': 'Invalid credentials.',
+		'apiErrors.EMAIL_ALREADY_REGISTERED': 'There is already an account registered with that email.',
+		'apiErrors.INVALID_RESET_TOKEN': 'The recovery link is invalid or is no longer available.',
+		'apiErrors.EXPIRED_RESET_TOKEN': 'The recovery link expired. Request a new one.',
+		'apiErrors.AUTH_TOKEN_REQUIRED': 'Authentication is required to continue.',
+		'apiErrors.AUTH_TOKEN_INVALID': 'Your session is invalid or expired.',
+		'apiErrors.AUTH_USER_NOT_FOUND': 'The authenticated user could not be found.',
+		'apiErrors.NOT_FOUND': 'The requested resource was not found.',
+		'apiErrors.INTERNAL_SERVER_ERROR': 'An internal server error occurred.'
 	},
 	'es': {
 		'locale.en': 'inglés',
@@ -500,6 +514,8 @@ const translations: Record<UiLocale, TranslationDictionary> = {
 		'auth.validation.passwordMismatch': 'Las contraseñas no coinciden.',
 		'auth.reset.updatedTitle': 'Contraseña actualizada',
 		'auth.reset.updatedBody': 'Ya podés iniciar sesión con tu nueva contraseña.',
+		'auth.reset.invalidLinkTitle': 'Enlace inválido o vencido',
+		'auth.reset.invalidLinkBody': 'Pedí un nuevo enlace de recuperación para continuar.',
 		'auth.validation.completeRequired': 'Completá los campos requeridos.',
 		'auth.validation.enterVisibleName': 'Ingresá un nombre visible para tu cuenta.',
 		'auth.toast.loginSuccessTitle': 'Login exitoso',
@@ -513,7 +529,19 @@ const translations: Record<UiLocale, TranslationDictionary> = {
 		'auth.session.validating': 'Validando sesión contra /api/auth/me...',
 		'auth.session.validated': 'Sesión validada correctamente contra el backend.',
 		'auth.session.redirectingLogin': '{message} Redirigiendo a login...',
-		'auth.session.expiredRedirecting': 'La sesión expiró. Redirigiendo a login...'
+		'auth.session.expiredRedirecting': 'La sesión expiró. Redirigiendo a login...',
+		'apiErrors.INVALID_EMAIL': 'Ingresá un email válido para continuar.',
+		'apiErrors.INVALID_PASSWORD': 'La contraseña debe tener al menos 8 caracteres.',
+		'apiErrors.INVALID_NAME': 'Ingresá un nombre visible válido.',
+		'apiErrors.INVALID_CREDENTIALS': 'Credenciales inválidas.',
+		'apiErrors.EMAIL_ALREADY_REGISTERED': 'Ya existe una cuenta registrada con ese email.',
+		'apiErrors.INVALID_RESET_TOKEN': 'El enlace de recuperación es inválido o ya no está disponible.',
+		'apiErrors.EXPIRED_RESET_TOKEN': 'El enlace de recuperación expiró. Pedí uno nuevo.',
+		'apiErrors.AUTH_TOKEN_REQUIRED': 'Necesitás autenticación para continuar.',
+		'apiErrors.AUTH_TOKEN_INVALID': 'Tu sesión es inválida o expiró.',
+		'apiErrors.AUTH_USER_NOT_FOUND': 'No se pudo encontrar al usuario autenticado.',
+		'apiErrors.NOT_FOUND': 'No se encontró el recurso solicitado.',
+		'apiErrors.INTERNAL_SERVER_ERROR': 'Ocurrió un error interno del servidor.'
 	}
 };
 

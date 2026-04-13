@@ -6,7 +6,8 @@ import {
 	postAuth,
 	postJson,
 	readSession,
-	saveSession
+	saveSession,
+	validateResetToken
 } from '../lib/auth-api';
 import type { GenericApiPayload } from '../lib/auth-api';
 import { showErrorAlert, showSuccessAlert, showToast } from '../lib/alerts';
@@ -28,8 +29,36 @@ function getSafeNextPath() {
 	return next && next.startsWith('/') ? next : '/home';
 }
 
+function getAuthenticatedHomePath() {
+	return '/home';
+}
+
+function redirectAuthenticatedUser() {
+	if (!readSession()) {
+		return;
+	}
+
+	redirectToPath(getAuthenticatedHomePath());
+}
+
+function bindAuthenticatedUserRedirect() {
+	redirectAuthenticatedUser();
+
+	window.addEventListener('pageshow', () => {
+		redirectAuthenticatedUser();
+	});
+}
+
 function getResetToken() {
 	return new URLSearchParams(window.location.search).get('token')?.trim() || '';
+}
+
+function setResetFormEnabled(form: HTMLFormElement, isEnabled: boolean) {
+	const controls = form.querySelectorAll<HTMLInputElement | HTMLButtonElement>('input, button[type="submit"]');
+	controls.forEach((control) => {
+		control.disabled = !isEnabled;
+	});
+	form.dataset.resetTokenValidated = isEnabled ? 'true' : 'false';
 }
 
 function setSubmittingState(form: HTMLFormElement, isSubmitting: boolean) {
@@ -87,6 +116,10 @@ async function submitAuthForm(form: HTMLFormElement, mode: FormMode) {
 			const password = String(formData.get('password') || '');
 			const confirmPassword = String(formData.get('confirmPassword') || '');
 			const token = getResetToken();
+
+			if (form.dataset.resetTokenValidated !== 'true') {
+				throw new ApiError(t('auth.reset.invalidLinkBody'), 400);
+			}
 
 			if (!token) {
 				throw new ApiError(t('auth.validation.missingToken'), 400);
@@ -150,6 +183,39 @@ async function submitAuthForm(form: HTMLFormElement, mode: FormMode) {
 	}
 }
 
+async function guardResetConfirmForm(form: HTMLFormElement) {
+	const token = getResetToken();
+	setResetFormEnabled(form, false);
+
+	if (!token) {
+		await showToast({
+			title: t('auth.reset.incompleteLinkTitle'),
+			text: t('auth.reset.incompleteLinkBody'),
+			icon: 'warning',
+			timer: 3200
+		});
+		redirectToPath('/reset-password');
+		return;
+	}
+
+	try {
+		await validateResetToken(token);
+		setResetFormEnabled(form, true);
+	} catch (error) {
+		const message = error instanceof ApiError ? error.message : t('auth.reset.invalidLinkBody');
+		await showErrorAlert(message, t('auth.reset.invalidLinkTitle'));
+		redirectToPath('/reset-password');
+	}
+}
+
+export function initLandingPage() {
+	bindAuthenticatedUserRedirect();
+}
+
+export function initPublicAuthPage() {
+	bindAuthenticatedUserRedirect();
+}
+
 export function initAuthForms() {
 	const forms = document.querySelectorAll<HTMLFormElement>('[data-auth-form]');
 
@@ -161,15 +227,8 @@ export function initAuthForms() {
 		form.dataset.bound = 'true';
 		const mode = (form.dataset.mode || 'login') as FormMode;
 
-		if (mode === 'reset-confirm' && !getResetToken()) {
-			const submitButton = form.querySelector<HTMLButtonElement>('button[type="submit"]');
-			submitButton?.setAttribute('disabled', 'true');
-			void showToast({
-				title: t('auth.reset.incompleteLinkTitle'),
-				text: t('auth.reset.incompleteLinkBody'),
-				icon: 'warning',
-				timer: 3200
-			});
+		if (mode === 'reset-confirm') {
+			void guardResetConfirmForm(form);
 		}
 
 		form.addEventListener('submit', (event) => {
