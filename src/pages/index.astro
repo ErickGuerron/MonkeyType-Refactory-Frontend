@@ -1,7 +1,7 @@
 ---
 import AppFooter from '../components/AppFooter.astro';
-import AppNavbar from '../components/AppNavbar.astro';
-import Layout from '../layouts/Layout.astro';
+import AppNavbar from '../ui/components/navigation/AppNavbar.astro';
+import Layout from '../ui/layouts/Layout.astro';
 ---
 
 
@@ -67,7 +67,7 @@ import Layout from '../layouts/Layout.astro';
 </Layout>
 
 <script>
-	import { initLandingPage } from '../scripts/auth-client';
+	import { initLandingPage } from '../app/scripts/auth-client';
 
 	initLandingPage();
 

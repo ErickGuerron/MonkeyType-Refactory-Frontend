@@ -1,4 +1,4 @@
-import { t } from './i18n';
+import { t } from '../../core/i18n';
 
 export const API_BASE_URL = (import.meta.env.PUBLIC_API_BASE_URL || 'http://localhost:3000/api').replace(/\/$/, '');
 export const AUTH_STORAGE_KEY = 'monkeytype.auth.session';

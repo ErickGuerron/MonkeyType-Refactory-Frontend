@@ -1,6 +1,6 @@
-import { ApiError } from '../lib/auth-api';
+import { ApiError } from '../../infrastructure/api/auth-api';
 import { Chart, type ChartConfiguration } from 'chart.js/auto';
-import { showErrorAlert, showToast } from '../lib/alerts';
+import { showErrorAlert, showToast } from '../../infrastructure/browser/alerts';
 import {
 	DEFAULT_PREFERENCES,
 	createResult,
@@ -11,8 +11,8 @@ import {
 	type TypingQuote,
 	type TypingResult,
 	type UserPreferences
-} from '../lib/typing-api';
-import { countWords, deriveTypingText } from '../lib/typing-text-transform';
+} from '../../infrastructure/api/typing-api';
+import { countWords, deriveTypingText } from '../../core/typing/text-transform';
 import {
 	applyThemePreference,
 	bindLogout,
@@ -22,8 +22,8 @@ import {
 	requireSession,
 	setStatus,
 	syncCurrentUser
-} from '../lib/private-session';
-import { getCurrentUiLocale, t } from '../lib/i18n';
+} from '../../core/session/private-session';
+import { getCurrentUiLocale, t } from '../../core/i18n';
 
 interface TypingMetrics {
 	wpm: number;

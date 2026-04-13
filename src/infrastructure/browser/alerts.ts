@@ -1,5 +1,5 @@
 import Swal, { type SweetAlertIcon, type SweetAlertOptions } from 'sweetalert2';
-import { t } from './i18n';
+import { t } from '../../core/i18n';
 
 const baseCustomClass = {
 	popup: 'monkey-swal',

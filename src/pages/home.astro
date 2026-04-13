@@ -1,6 +1,6 @@
 ---
 import HomeTypingExperience from '../components/home/HomeTypingExperience.astro';
-import PrivateLayout from '../layouts/PrivateLayout.astro';
+import PrivateLayout from '../ui/layouts/PrivateLayout.astro';
 ---
 
 <PrivateLayout
@@ -22,7 +22,7 @@ import PrivateLayout from '../layouts/PrivateLayout.astro';
 </PrivateLayout>
 
 <script>
-	import { initHomePage } from '../scripts/home-page';
+	import { initHomePage } from '../app/scripts/home-page';
 
 	initHomePage();
 </script>

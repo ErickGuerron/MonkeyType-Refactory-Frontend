@@ -1,5 +1,5 @@
-import { clearSession, getCurrentUser, readSession, type PublicUser, type SessionPayload } from './auth-api';
-import { getCurrentUiLocale } from './i18n';
+import { clearSession, getCurrentUser, readSession, type PublicUser, type SessionPayload } from '../../infrastructure/api/auth-api';
+import { getCurrentUiLocale } from '../i18n';
 
 type StatusTone = 'error' | 'success' | 'info';
 type ThemePreference = 'system' | 'dark' | 'light';

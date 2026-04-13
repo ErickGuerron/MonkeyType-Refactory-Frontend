@@ -1,6 +1,6 @@
 ---
-import AppFooter from '../components/AppFooter.astro';
-import AppNavbar from '../components/AppNavbar.astro';
+import AppFooter from '../../components/AppFooter.astro';
+import AppNavbar from '../components/navigation/AppNavbar.astro';
 import Layout from './Layout.astro';
 
 interface Props {
@@ -35,7 +35,7 @@ const {
 </Layout>
 
 <script>
-	import { initPublicAuthPage } from '../scripts/auth-client';
+	import { initPublicAuthPage } from '../../app/scripts/auth-client';
 
 	initPublicAuthPage();
 </script>

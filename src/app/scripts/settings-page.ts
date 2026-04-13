@@ -1,14 +1,14 @@
-import { ApiError } from '../lib/auth-api';
-import { showErrorAlert, showToast } from '../lib/alerts';
-import { getCurrentUiLocale } from '../lib/i18n';
+import { ApiError } from '../../infrastructure/api/auth-api';
+import { showErrorAlert, showToast } from '../../infrastructure/browser/alerts';
+import { getCurrentUiLocale } from '../../core/i18n';
 import {
 	DEFAULT_PREFERENCES,
 	getMyPreferences,
 	readCachedPreferences,
 	updateMyPreferences,
 	type UserPreferences
-} from '../lib/typing-api';
-import { t } from '../lib/i18n';
+} from '../../infrastructure/api/typing-api';
+import { t } from '../../core/i18n';
 import {
 	applyThemePreference,
 	bindLogout,
@@ -17,7 +17,7 @@ import {
 	requireSession,
 	setStatus,
 	syncCurrentUser
-} from '../lib/private-session';
+} from '../../core/session/private-session';
 
 function serializePreferences(form: HTMLFormElement): UserPreferences {
 	const formData = new FormData(form);

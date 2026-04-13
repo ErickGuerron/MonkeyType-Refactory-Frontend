@@ -1,5 +1,5 @@
 ---
-import PrivateLayout from '../layouts/PrivateLayout.astro';
+import PrivateLayout from '../ui/layouts/PrivateLayout.astro';
 
 const modeOptions = [
 	{ value: 'time', label: 'Time (configurable duration)', key: 'settings.mode.time' },
@@ -77,14 +77,6 @@ const themeOptions = [
 				</div>
 				<p data-i18n="settings.experienceBody">The essentials so the typing home arrives ready: theme, quote language, and default mode.</p>
 				<div class="settings-fields">
-					<label class="settings-field settings-field--wide">
-						<span data-i18n="settings.uiLanguage">UI language</span>
-						<select data-ui-locale-select aria-label="UI language selector" data-i18n-aria-label="settings.uiLanguageAria">
-							<option value="en" data-i18n-option="locale.en">English</option>
-							<option value="es" data-i18n-option="locale.es">Spanish</option>
-						</select>
-						<small data-i18n="settings.uiLanguageBody">Changes the language of the whole page interface without affecting the quote language.</small>
-					</label>
 					<label class="settings-field">
 						<span data-i18n="settings.theme">Theme</span>
 						<select name="theme">
@@ -193,7 +185,7 @@ const themeOptions = [
 </PrivateLayout>
 
 <script>
-	import { initSettingsPage } from '../scripts/settings-page';
+	import { initSettingsPage } from '../app/scripts/settings-page';
 
 	initSettingsPage();
 </script>

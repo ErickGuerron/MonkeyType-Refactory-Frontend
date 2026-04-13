@@ -1,4 +1,4 @@
-import type { UserPreferences } from './typing-api';
+import type { UserPreferences } from '../../infrastructure/api/typing-api';
 
 type TypingMode = UserPreferences['defaultMode'];
 

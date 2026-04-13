@@ -8,10 +8,10 @@ import {
 	readSession,
 	saveSession,
 	validateResetToken
-} from '../lib/auth-api';
-import type { GenericApiPayload } from '../lib/auth-api';
-import { showErrorAlert, showSuccessAlert, showToast } from '../lib/alerts';
-import { getCurrentUiLocale, t } from '../lib/i18n';
+} from '../../infrastructure/api/auth-api';
+import type { GenericApiPayload } from '../../infrastructure/api/auth-api';
+import { showErrorAlert, showSuccessAlert, showToast } from '../../infrastructure/browser/alerts';
+import { getCurrentUiLocale, t } from '../../core/i18n';
 
 type FormMode = 'login' | 'register' | 'reset' | 'reset-confirm';
 
