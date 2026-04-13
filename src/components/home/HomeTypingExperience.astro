@@ -9,13 +9,13 @@
     <div class="typing-config__group">
       <span class="typing-config__label" data-i18n="home.mode">mode</span>
       <div class="typing-config__chips">
-        <label class="typing-config__select-shell typing-config__select-shell--chip">
-          <select class="typing-config__select typing-config__select--chip" data-pref-select="timeMode" aria-label="Select time mode" data-i18n-aria-label="home.selectTimeModeAria">
-            <option value="30" data-i18n-option="home.mode.time30">time 30</option>
-            <option value="60" data-i18n-option="home.mode.time60">time 60</option>
-            <option value="120" data-i18n-option="home.mode.time120">time 120</option>
-          </select>
-        </label>
+        <button
+          class="typing-chip"
+          data-pref-key="defaultMode"
+          data-pref-value="time"
+          data-i18n="home.time"
+          type="button">time</button
+        >
         <button
           class="typing-chip"
           data-pref-key="defaultMode"
@@ -23,13 +23,13 @@
           data-i18n="home.mode.quote"
           type="button">quote</button
         >
-        <label class="typing-config__select-shell typing-config__select-shell--chip">
-          <select class="typing-config__select typing-config__select--chip" data-pref-select="wordsMode" aria-label="Select words mode" data-i18n-aria-label="home.selectWordsModeAria">
-            <option value="50" data-i18n-option="home.mode.words50">words 50</option>
-            <option value="100" data-i18n-option="home.mode.words100">words 100</option>
-            <option value="150" data-i18n-option="home.mode.words150">words 150</option>
-          </select>
-        </label>
+        <button
+          class="typing-chip"
+          data-pref-key="defaultMode"
+          data-pref-value="words"
+          data-i18n="home.words"
+          type="button">words</button
+        >
         <button
           class="typing-chip"
           data-pref-key="defaultMode"
@@ -81,6 +81,20 @@
           data-i18n="home.sound"
           type="button">sound</button
         >
+        <label class="typing-config__select-shell typing-config__select-shell--chip typing-config__select-shell--signal" data-mode-control="time">
+          <select class="typing-config__select typing-config__select--chip" data-pref-select="timeMode" aria-label="Select time mode" data-i18n-aria-label="home.selectTimeModeAria">
+            <option value="30">30</option>
+            <option value="60">60</option>
+            <option value="120">120</option>
+          </select>
+        </label>
+        <label class="typing-config__select-shell typing-config__select-shell--chip typing-config__select-shell--signal" data-mode-control="words">
+          <select class="typing-config__select typing-config__select--chip" data-pref-select="wordsMode" aria-label="Select words mode" data-i18n-aria-label="home.selectWordsModeAria">
+            <option value="50">50</option>
+            <option value="100">100</option>
+            <option value="150">150</option>
+          </select>
+        </label>
       </div>
     </div>
   </section>
@@ -328,6 +342,14 @@
 		flex: 1 1 7.25rem;
 		min-width: 0;
 		max-width: 10rem;
+	}
+
+	.typing-config__select-shell--signal {
+		flex: 1 1 8rem;
+	}
+
+	.typing-config__select-shell--signal[hidden] {
+		display: none !important;
 	}
 
 	.typing-config__select-shell::after {

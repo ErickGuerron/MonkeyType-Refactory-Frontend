@@ -31,6 +31,10 @@ interface TypingMetrics {
 	accuracy: number;
 	durationInSeconds: number;
 	correctCharacters: number;
+	correctWordCharacters: number;
+	correctSpaces: number;
+	extraCharacters: number;
+	missedCharacters: number;
 	typedCharacters: number;
 	mistakes: number;
 	totalKeyStrokes: number;
@@ -54,6 +58,16 @@ interface ChartPoint {
 }
 
 type WordModeCount = 50 | 100 | 150;
+
+interface CharacterBreakdown {
+	correctWordCharacters: number;
+	allCorrectCharacters: number;
+	incorrectCharacters: number;
+	extraCharacters: number;
+	missedCharacters: number;
+	spaces: number;
+	correctSpaces: number;
+}
 
 const WORD_MODE_COUNTS: WordModeCount[] = [50, 100, 150];
 const DEFAULT_WORD_MODE_COUNT: WordModeCount = 50;
@@ -264,30 +278,108 @@ function formatDuration(seconds: number) {
 	return `${minutes}m ${rest}s`;
 }
 
+function countCharacterBreakdown(input: string, target: string, final = false, defaultMode: UserPreferences['defaultMode'] = 'quote'): CharacterBreakdown {
+	const inputWords = input.length > 0 ? input.split(' ') : [''];
+	const targetWords = target.length > 0 ? target.split(' ') : [''];
+
+	let correctWordCharacters = 0;
+	let allCorrectCharacters = 0;
+	let incorrectCharacters = 0;
+	let extraCharacters = 0;
+	let missedCharacters = 0;
+	const spaces = Math.max(inputWords.length - 1, 0);
+	let correctSpaces = 0;
+
+	for (let wordIndex = 0; wordIndex < inputWords.length; wordIndex += 1) {
+		const inputWord = inputWords[wordIndex] || '';
+		const targetWord = targetWords[wordIndex] || '';
+
+		if (inputWord === targetWord) {
+			correctWordCharacters += targetWord.length;
+			allCorrectCharacters += targetWord.length;
+			if (wordIndex < inputWords.length - 1) {
+				correctSpaces += 1;
+			}
+			continue;
+		}
+
+		if (inputWord.length >= targetWord.length) {
+			for (let charIndex = 0; charIndex < inputWord.length; charIndex += 1) {
+				if (charIndex < targetWord.length) {
+					if (inputWord[charIndex] === targetWord[charIndex]) {
+						allCorrectCharacters += 1;
+					} else {
+						incorrectCharacters += 1;
+					}
+				} else {
+					extraCharacters += 1;
+				}
+			}
+			continue;
+		}
+
+		let partialCorrect = 0;
+		let partialIncorrect = 0;
+		let partialMissed = 0;
+
+		for (let charIndex = 0; charIndex < targetWord.length; charIndex += 1) {
+			if (charIndex < inputWord.length) {
+				if (inputWord[charIndex] === targetWord[charIndex]) {
+					partialCorrect += 1;
+				} else {
+					partialIncorrect += 1;
+				}
+			} else {
+				partialMissed += 1;
+			}
+		}
+
+		allCorrectCharacters += partialCorrect;
+		incorrectCharacters += partialIncorrect;
+
+		const shouldCountPartialLastWord = !final || (final && defaultMode === 'time');
+		if (wordIndex === inputWords.length - 1 && shouldCountPartialLastWord) {
+			if (partialIncorrect === 0) {
+				correctWordCharacters += partialCorrect;
+			}
+		} else {
+			missedCharacters += partialMissed;
+		}
+	}
+
+	return {
+		correctWordCharacters,
+		allCorrectCharacters,
+		incorrectCharacters,
+		extraCharacters,
+		missedCharacters,
+		spaces,
+		correctSpaces
+	};
+}
+
 function computeMetrics(
 	input: string,
 	target: string,
 	startedAt: number | null,
 	totalKeyStrokes = input.length,
-	incorrectKeyStrokes = Math.max(input.length - target.split('').filter((character, index) => input[index] === character).length, 0)
+	incorrectKeyStrokes = Math.max(input.length - target.split('').filter((character, index) => input[index] === character).length, 0),
+	defaultMode: UserPreferences['defaultMode'] = 'quote',
+	final = false
 ): TypingMetrics {
 	const typedCharacters = input.length;
-	const comparableLength = Math.min(typedCharacters, target.length);
-	let correctCharacters = 0;
-
-	for (let index = 0; index < comparableLength; index += 1) {
-		if (input[index] === target[index]) {
-			correctCharacters += 1;
-		}
-	}
+	const breakdown = countCharacterBreakdown(input, target, final, defaultMode);
+	const correctCharacters = breakdown.allCorrectCharacters;
 
 	const durationInSeconds = Math.max(
 		1,
 		startedAt ? Math.ceil((Date.now() - startedAt) / 1000) : 1
 	);
 	const durationInMinutes = durationInSeconds / 60;
-	const rawWpm = totalKeyStrokes === 0 ? 0 : totalKeyStrokes / 5 / durationInMinutes;
-	const wpm = correctCharacters === 0 ? 0 : correctCharacters / 5 / durationInMinutes;
+	const rawCharacters = breakdown.allCorrectCharacters + breakdown.spaces + breakdown.incorrectCharacters + breakdown.extraCharacters;
+	const rawWpm = rawCharacters === 0 ? 0 : rawCharacters / 5 / durationInMinutes;
+	const netCharacters = breakdown.correctWordCharacters + breakdown.correctSpaces;
+	const wpm = netCharacters === 0 ? 0 : netCharacters / 5 / durationInMinutes;
 	const normalizedTotalKeyStrokes = Math.max(totalKeyStrokes, typedCharacters, 1);
 	const normalizedIncorrectKeyStrokes = Math.max(0, Math.min(incorrectKeyStrokes, normalizedTotalKeyStrokes));
 	const accuracy = ((normalizedTotalKeyStrokes - normalizedIncorrectKeyStrokes) / normalizedTotalKeyStrokes) * 100;
@@ -298,11 +390,36 @@ function computeMetrics(
 		accuracy: roundMetric(accuracy),
 		durationInSeconds,
 		correctCharacters,
+		correctWordCharacters: breakdown.correctWordCharacters,
+		correctSpaces: breakdown.correctSpaces,
+		extraCharacters: breakdown.extraCharacters,
+		missedCharacters: breakdown.missedCharacters,
 		typedCharacters,
 		mistakes: normalizedIncorrectKeyStrokes,
 		totalKeyStrokes: normalizedTotalKeyStrokes,
 		incorrectKeyStrokes: normalizedIncorrectKeyStrokes
 	};
+}
+
+function calculateBurstMetric(input: string, burstStartedAt: number | null, burstStartIndex: number) {
+	if (!burstStartedAt) {
+		return 0;
+	}
+
+	const elapsedSeconds = Math.max((Date.now() - burstStartedAt) / 1000, 0.12);
+	const slice = input.slice(burstStartIndex);
+	let burstChars = slice.replace(/\s+$/g, '').length;
+
+	if (burstChars === 0) {
+		const previousWord = input.slice(0, burstStartIndex).trimEnd().split(/\s+/).pop() || '';
+		burstChars = previousWord.length;
+	}
+
+	if (burstChars === 0) {
+		return 0;
+	}
+
+	return roundMetric((burstChars / 5) / (elapsedSeconds / 60));
 }
 
 function renderQuoteText(
@@ -428,6 +545,7 @@ export function initHomePage() {
 	const logoutButton = page.querySelector<HTMLButtonElement>('[data-action="logout"]');
 	const configButtons = Array.from(page.querySelectorAll<HTMLButtonElement>('[data-pref-key]'));
 	const configSelects = Array.from(page.querySelectorAll<HTMLSelectElement>('[data-pref-select]'));
+	const modeControlShells = Array.from(page.querySelectorAll<HTMLElement>('[data-mode-control]'));
 	const historyList = page.querySelector<HTMLElement>('[data-history-list]');
 	const resultCard = page.querySelector<HTMLElement>('[data-result-card]');
 	const resultTitle = page.querySelector<HTMLElement>('[data-result-title]');
@@ -471,6 +589,9 @@ export function initHomePage() {
 		resultQuoteSource: null as string | null,
 		results: [] as TypingResult[],
 		startedAt: null as number | null,
+		currentBurstStartedAt: null as number | null,
+		currentBurstStartIndex: 0,
+		lastInputValue: '',
 		completed: false,
 		lastMistakeCount: 0,
 		metricSamples: [] as MetricSample[],
@@ -481,35 +602,21 @@ export function initHomePage() {
 		isUpdatingPreferences: false
 	};
 
-	const upsertMetricSample = (metrics: TypingMetrics) => {
+	const upsertMetricSample = (metrics: TypingMetrics, input: string) => {
 		if (!state.startedAt) {
 			return;
 		}
 
 		const elapsedMs = Math.max(Date.now() - state.startedAt, 250);
-		const bucketMs = 250;
+		const bucketMs = 1000;
 		const bucketKey = Math.floor(elapsedMs / bucketMs);
 		const lastSample = state.metricSamples[state.metricSamples.length - 1];
-		const rollingBaseline = [...state.metricSamples].reverse().find((sample) => sample.elapsedMs <= elapsedMs - 1000);
-		const burstBaseline = lastSample;
-
-		const baselineForWpm = rollingBaseline || state.metricSamples[0];
-		const baselineForBurst = burstBaseline || lastSample || state.metricSamples[0];
-
-		const rollingDeltaSeconds = Math.max((elapsedMs - (baselineForWpm?.elapsedMs || 0)) / 1000, 0.25);
-		const burstDeltaSeconds = Math.max((elapsedMs - (baselineForBurst?.elapsedMs || 0)) / 1000, 0.12);
-		const rollingCorrectCharacters = Math.max(metrics.correctCharacters - (baselineForWpm?.correctCharactersAtSample || 0), 0);
-		const rollingRawKeyStrokes = Math.max(metrics.totalKeyStrokes - (baselineForWpm?.totalKeyStrokesAtSample || 0), 0);
-		const burstRawKeyStrokes = Math.max(metrics.totalKeyStrokes - (baselineForBurst?.totalKeyStrokesAtSample || 0), 0);
-
-		const instantaneousRawWpm = roundMetric((rollingRawKeyStrokes / 5) / (rollingDeltaSeconds / 60));
-		const instantaneousWpm = roundMetric((rollingCorrectCharacters / 5) / (rollingDeltaSeconds / 60));
-		const burstWpm = roundMetric((burstRawKeyStrokes / 5) / (burstDeltaSeconds / 60));
+		const burstWpm = calculateBurstMetric(input, state.currentBurstStartedAt, state.currentBurstStartIndex);
 
 		const sample: MetricSample = {
 			elapsedMs,
-			wpm: instantaneousWpm,
-			rawWpm: instantaneousRawWpm,
+			wpm: metrics.wpm,
+			rawWpm: metrics.rawWpm,
 			burstWpm,
 			typedCharactersAtSample: metrics.typedCharacters,
 			correctCharactersAtSample: metrics.correctCharacters,
@@ -832,17 +939,24 @@ export function initHomePage() {
 
 		configSelects.forEach((select) => {
 			const key = select.dataset.prefSelect as keyof UserPreferences | undefined;
+			const shell = select.closest<HTMLElement>('[data-mode-control]');
 			if (!key) {
 				return;
 			}
 
 			if (key === 'timeMode') {
+				if (shell) {
+					shell.hidden = state.preferences.defaultMode !== 'time';
+				}
 				select.value = String(state.preferences.timeDuration);
 				select.disabled = state.isUpdatingPreferences;
 				return;
 			}
 
 			if (key === 'wordsMode') {
+				if (shell) {
+					shell.hidden = state.preferences.defaultMode !== 'words';
+				}
 				select.value = String(state.wordCount);
 				select.disabled = state.isUpdatingPreferences;
 				return;
@@ -850,6 +964,18 @@ export function initHomePage() {
 
 			select.value = String(state.preferences[key]);
 			select.disabled = state.isUpdatingPreferences;
+		});
+
+		modeControlShells.forEach((shell) => {
+			const mode = shell.dataset.modeControl as UserPreferences['defaultMode'] | undefined;
+			if (!mode || (mode !== 'time' && mode !== 'words')) {
+				return;
+			}
+
+			const shouldShow = state.preferences.defaultMode === mode;
+			shell.hidden = !shouldShow;
+			shell.setAttribute('aria-hidden', shouldShow ? 'false' : 'true');
+			shell.style.display = shouldShow ? '' : 'none';
 		});
 
 		finishZenButtons.forEach((button) => {
@@ -1036,6 +1162,9 @@ export function initHomePage() {
 		clearTimer();
 
 		state.startedAt = null;
+		state.currentBurstStartedAt = null;
+		state.currentBurstStartIndex = 0;
+		state.lastInputValue = '';
 		state.completed = false;
 		state.lastMistakeCount = 0;
 		state.metricSamples = [];
@@ -1055,7 +1184,7 @@ export function initHomePage() {
 		}
 
 		const initialTimerLabel = getInitialTimerLabel();
-		updateStats(computeMetrics('', state.preferences.defaultMode === 'zen' ? '' : state.quote?.text || '', null, 0, 0), initialTimerLabel);
+		updateStats(computeMetrics('', state.preferences.defaultMode === 'zen' ? '' : state.quote?.text || '', null, 0, 0, state.preferences.defaultMode), initialTimerLabel);
 		if (state.preferences.defaultMode !== 'time') {
 			updateLiveState();
 		}
@@ -1080,9 +1209,11 @@ export function initHomePage() {
 			metricsTarget,
 			state.startedAt,
 			state.totalKeyStrokes,
-			state.incorrectKeyStrokes
+			state.incorrectKeyStrokes,
+			state.preferences.defaultMode,
+			true
 		);
-		upsertMetricSample(metrics);
+		upsertMetricSample(metrics, textArea.value);
 		updateStats(metrics, formatDuration(metrics.durationInSeconds));
 		playTone(state.preferences.soundEnabled, 'success');
 
@@ -1140,7 +1271,8 @@ export function initHomePage() {
 			metricsTarget,
 			state.startedAt,
 			state.totalKeyStrokes,
-			state.incorrectKeyStrokes
+			state.incorrectKeyStrokes,
+			state.preferences.defaultMode
 		);
 		const elapsedSeconds = state.startedAt ? Math.ceil((Date.now() - state.startedAt) / 1000) : 0;
 		const remainingSeconds = Math.max(state.preferences.timeDuration - elapsedSeconds, 0);
@@ -1154,6 +1286,7 @@ export function initHomePage() {
 					: getProgressLabel();
 
 		updateStats(metrics, timeLabel);
+		upsertMetricSample(metrics, textArea.value);
 		renderQuoteText(quoteText, state.quote.text, textArea.value, state.preferences.defaultMode, state.completed);
 		syncQuoteViewport();
 		syncPreferenceButtons();
@@ -1186,6 +1319,10 @@ export function initHomePage() {
 		}
 
 		state.startedAt = Date.now();
+		if (state.currentBurstStartedAt === null && textArea.value.length > 0) {
+			state.currentBurstStartedAt = state.startedAt;
+			state.currentBurstStartIndex = 0;
+		}
 		ensureTimerRunning();
 	};
 
@@ -1443,6 +1580,17 @@ export function initHomePage() {
 		if (!state.quote || state.completed) {
 			return;
 		}
+
+		const previousValue = state.lastInputValue;
+		const nextValue = textArea.value;
+		if (nextValue.length > previousValue.length) {
+			const previousEndsWord = previousValue.length === 0 || /\s$/.test(previousValue);
+			if (previousEndsWord) {
+				state.currentBurstStartedAt = Date.now();
+				state.currentBurstStartIndex = previousValue.length;
+			}
+		}
+		state.lastInputValue = nextValue;
 
 		syncInputWithQuoteLimit();
 		startIfNeeded();
